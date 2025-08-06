@@ -1,7 +1,7 @@
 # DIM Plugins (Java)
 
 
-[![License](https://img.shields.io/github/license/dimchat/plugins-java)](https://github.com/dimchat/plugins-java/blob/master/LICENSE)
+[![License](https://img.shields.io/github/license/dimchat/plugins-java)](https://github.com/dimchat/plugins-java/blob/main/LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/dimchat/plugins-java/pulls)
 [![Platform](https://img.shields.io/badge/Platform-Java%208-brightgreen.svg)](https://github.com/dimchat/plugins-java/wiki)
 [![Issues](https://img.shields.io/github/issues/dimchat/plugins-java)](https://github.com/dimchat/plugins-java/issues)

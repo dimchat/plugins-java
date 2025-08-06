@@ -43,7 +43,7 @@ public class Secp256k1 {
     public static native byte[] computePublicKey(byte[] priKey);
 
     /**
-     *  Verify message hash & signature for SECP256k1
+     *  Verify message hash &amp; signature for SECP256k1
      *
      * @param pubKey    - 64 bytes, public key,
      * @param msgHash   - 32 bytes, sha256(data)
@@ -57,7 +57,7 @@ public class Secp256k1 {
      *
      * @param priKey  - 32 bytes, private key
      * @param msgHash - 32 bytes, sha256(data)
-     * @return <=72 bytes, signature
+     * @return &lt;=72 bytes, signature
      */
     public static native byte[] sign(byte[] priKey, byte[] msgHash);
 
