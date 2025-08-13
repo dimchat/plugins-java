@@ -180,7 +180,12 @@ public class NativePluginLoader implements Runnable {
             public PrivateKey generatePrivateKey() {
                 Map<String, Object> key = new HashMap<>();
                 key.put("algorithm", AsymmetricAlgorithms.RSA);
-                return parsePrivateKey(key);
+                try {
+                    return new RSAPrivateKey(key);
+                } catch (NoSuchAlgorithmException e) {
+                    e.printStackTrace();
+                    return null;
+                }
             }
 
             @Override
@@ -234,7 +239,12 @@ public class NativePluginLoader implements Runnable {
             public PrivateKey generatePrivateKey() {
                 Map<String, Object> key = new HashMap<>();
                 key.put("algorithm", AsymmetricAlgorithms.ECC);
-                return parsePrivateKey(key);
+                try {
+                    return new ECCPrivateKey(key);
+                } catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException e) {
+                    e.printStackTrace();
+                    return null;
+                }
             }
 
             @Override

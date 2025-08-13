@@ -91,10 +91,7 @@ public class PluginLoader implements Runnable {
 
         registerSymmetricKeyFactories();
 
-        registerIDFactory();
-        registerAddressFactory();
-        registerMetaFactories();
-        registerDocumentFactories();
+        registerEntityFactories();
 
     }
 
@@ -334,24 +331,24 @@ public class PluginLoader implements Runnable {
     }
 
     /**
-     *  ID factory
+     *  ID, Address, Meta, Document parsers
      */
+    protected void registerEntityFactories() {
+
+        registerIDFactory();
+        registerAddressFactory();
+        registerMetaFactories();
+        registerDocumentFactories();
+
+    }
     protected void registerIDFactory() {
 
         ID.setFactory(new IdentifierFactory());
     }
-
-    /**
-     *  Address factory
-     */
     protected void registerAddressFactory() {
 
         Address.setFactory(new BaseAddressFactory());
     }
-
-    /**
-     *  Meta factories
-     */
     protected void registerMetaFactories() {
 
         setMetaFactory(MetaType.MKM, "mkm", null);
@@ -365,10 +362,6 @@ public class PluginLoader implements Runnable {
         Meta.setFactory(type, factory);
         Meta.setFactory(alias, factory);
     }
-
-    /**
-     *  Document factories
-     */
     protected void registerDocumentFactories() {
 
         setDocumentFactory("*", null);

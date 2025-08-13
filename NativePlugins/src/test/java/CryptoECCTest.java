@@ -21,7 +21,7 @@ public class CryptoECCTest {
     private static final Facebook facebook = SharedFacebook.getInstance();
 
     static {
-        String javaLibraryPath = "/Users/moky/Documents/GitHub/dimchat/sdk-java/NativePlugins/libs";
+        String javaLibraryPath = "/Users/moky/Documents/GitHub/dimchat/plugins-java/NativePlugins/libs";
         System.load(javaLibraryPath + "/libSecp256k1.so");
         //System.loadLibrary("Secp256k1");
     }

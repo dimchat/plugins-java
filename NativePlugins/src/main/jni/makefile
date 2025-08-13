@@ -2,7 +2,7 @@
 JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home
 CFLAGS=-fPIC -Wall -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/darwin
 
-LIBS=/Users/moky/Documents/GitHub/dimchat/sdk-java/NativePlugins/libs
+LIBS=/Users/moky/Documents/GitHub/dimchat/plugins-java/NativePlugins/libs
 
 clean:
 	rm -f $(LIBS)/libSecp256k1.so
