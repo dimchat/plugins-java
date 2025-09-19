@@ -11,13 +11,9 @@ import chat.dim.protocol.Document;
 import chat.dim.protocol.ID;
 import chat.dim.protocol.Meta;
 import chat.dim.mkm.BTCAddress;
-import chat.dim.mkm.BaseGroup;
-import chat.dim.mkm.Group;
-import chat.dim.Facebook;
 
 public class EntityTest {
 
-    private static final Facebook facebook = SharedFacebook.getInstance();
     private static final String satoshi = "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa";
 
     private String getIDInfo(ID identifier) {
@@ -85,42 +81,5 @@ public class EntityTest {
         Log.info("list<ID>: " + array);
     }
 
-//    @Test
-//    public void testMeta() {
-//        PrivateKey sk = PrivateKey.generate(PrivateKey.RSA);
-//        PublicKey pk = sk.getPublicKey();
-//        String seed = "moky";
-//        Meta meta = Meta.generate(Meta.MKM, sk, seed);
-//        Log.info("meta: " + meta + ", detail: " + getMetaInfo(meta));
-//        Assert.assertTrue(MetaUtils.matches(pk, meta));
-//
-//        ID identifier = ID.generate(meta, EntityType.USER.value, null);
-//        Log.info("ID: " + identifier + ", detail: " + getIDInfo(identifier));
-//        Assert.assertTrue(MetaUtils.matches(identifier, meta));
-//
-//        User user = new BaseUser(identifier);
-//        user.setDataSource(facebook);
-//        facebook.cache(user);
-//
-//        byte[] signature = user.sign(data);
-//        Assert.assertTrue(user.verify(data, signature));
-//        Log.info("signature OK!");
-//
-//        byte[] ciphertext = user.encrypt(data);
-//        byte[] plaintext = user.decrypt(ciphertext);
-//        Assert.assertArrayEquals(data, plaintext);
-//        Log.info("decryption OK!");
-//    }
-
-    @Test
-    public void testGroup() {
-        ID identifier = ID.parse("Group-570334743@a1FxYVwqEFud9nSrfkQ3gPNJ4GXabC67i");
-        Group group = new BaseGroup(identifier);
-        group.setDataSource(facebook);
-
-        Log.info("founder: " + group.getFounder());
-        Log.info("owner: " + group.getOwner());
-        Log.info("members: " + group.getMembers());
-    }
 }
 

@@ -28,6 +28,9 @@ package chat.dim.crypto;
 import java.util.HashMap;
 import java.util.Map;
 
+import chat.dim.protocol.SymmetricAlgorithms;
+import chat.dim.protocol.SymmetricKey;
+
 /**
  *  Symmetric key for broadcast message,
  *  which will do nothing when en/decoding message data

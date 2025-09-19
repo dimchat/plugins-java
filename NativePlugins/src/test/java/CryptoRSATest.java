@@ -5,13 +5,13 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.Map;
 
-import chat.dim.crypto.AsymmetricAlgorithms;
-import chat.dim.crypto.DecryptKey;
-import chat.dim.crypto.EncryptKey;
-import chat.dim.crypto.PrivateKey;
-import chat.dim.crypto.PublicKey;
 import chat.dim.format.Hex;
 import chat.dim.format.UTF8;
+import chat.dim.protocol.AsymmetricAlgorithms;
+import chat.dim.protocol.DecryptKey;
+import chat.dim.protocol.EncryptKey;
+import chat.dim.protocol.PrivateKey;
+import chat.dim.protocol.PublicKey;
 import chat.dim.Facebook;
 
 public class CryptoRSATest {

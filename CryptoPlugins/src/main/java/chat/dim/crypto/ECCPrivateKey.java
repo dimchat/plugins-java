@@ -40,6 +40,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import chat.dim.ecc.ECCKeys;
+import chat.dim.protocol.PublicKey;
 import chat.dim.utils.CryptoUtils;
 
 /**

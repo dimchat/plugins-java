@@ -59,6 +59,16 @@ import chat.dim.dkd.group.JoinGroupCommand;
 import chat.dim.dkd.group.QuitGroupCommand;
 import chat.dim.dkd.group.ResetGroupCommand;
 import chat.dim.dkd.group.ResignGroupCommand;
+import chat.dim.ext.AccountGeneralFactory;
+import chat.dim.ext.CommandGeneralFactory;
+import chat.dim.ext.CryptoKeyGeneralFactory;
+import chat.dim.ext.FormatGeneralFactory;
+import chat.dim.ext.MessageGeneralFactory;
+import chat.dim.ext.SharedAccountExtensions;
+import chat.dim.ext.SharedCommandExtensions;
+import chat.dim.ext.SharedCryptoExtensions;
+import chat.dim.ext.SharedFormatExtensions;
+import chat.dim.ext.SharedMessageExtensions;
 import chat.dim.msg.MessageFactory;
 import chat.dim.protocol.Command;
 import chat.dim.protocol.Content;
@@ -72,27 +82,12 @@ import chat.dim.protocol.group.GroupCommand;
 /**
  *  Core Extensions Loader
  */
-public class ExtensionLoader implements Runnable {
-
-    private boolean loaded = false;
-
-    @Override
-    public void run() {
-        if (loaded) {
-            // no need to load it again
-            return;
-        } else {
-            // mark it to loaded
-            loaded = true;
-        }
-        // try to load all extensions
-        load();
-    }
+public class ExtensionLoader {
 
     /**
      *  Register core factories
      */
-    protected void load() {
+    public void load() {
 
         registerCoreHelpers();
 

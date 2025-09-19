@@ -5,12 +5,12 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.Map;
 
-import chat.dim.crypto.SymmetricAlgorithms;
-import chat.dim.crypto.SymmetricKey;
 import chat.dim.format.Base64;
 import chat.dim.format.Hex;
 import chat.dim.format.JSON;
 import chat.dim.format.UTF8;
+import chat.dim.protocol.SymmetricAlgorithms;
+import chat.dim.protocol.SymmetricKey;
 import chat.dim.Facebook;
 
 public class CryptoAESTest {

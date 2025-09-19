@@ -23,14 +23,14 @@
  * SOFTWARE.
  * ==============================================================================
  */
-package chat.dim.plugins;
+package chat.dim.ext;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import chat.dim.crypto.PrivateKey;
-import chat.dim.crypto.PublicKey;
-import chat.dim.crypto.SymmetricKey;
+import chat.dim.protocol.PrivateKey;
+import chat.dim.protocol.PublicKey;
+import chat.dim.protocol.SymmetricKey;
 import chat.dim.type.Converter;
 import chat.dim.type.Wrapper;
 

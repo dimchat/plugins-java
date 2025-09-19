@@ -36,7 +36,7 @@ import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 
-import chat.dim.crypto.AsymmetricAlgorithms;
+import chat.dim.protocol.AsymmetricAlgorithms;
 import chat.dim.utils.CryptoUtils;
 
 final class RFC {

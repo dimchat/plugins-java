@@ -8,17 +8,14 @@ import chat.dim.Facebook;
 import chat.dim.compat.CompatibleMetaFactory;
 import chat.dim.core.Archivist;
 import chat.dim.core.Barrack;
-import chat.dim.crypto.DecryptKey;
-import chat.dim.crypto.PrivateKey;
-import chat.dim.crypto.SignKey;
 import chat.dim.mkm.MetaUtils;
-import chat.dim.plugins.CryptoPluginLoader;
-import chat.dim.plugins.ExtensionLoader;
-import chat.dim.plugins.PluginLoader;
+import chat.dim.protocol.DecryptKey;
 import chat.dim.protocol.Document;
 import chat.dim.protocol.ID;
 import chat.dim.protocol.Meta;
 import chat.dim.protocol.MetaType;
+import chat.dim.protocol.PrivateKey;
+import chat.dim.protocol.SignKey;
 
 public class SharedFacebook extends Facebook {
     private static final SharedFacebook ourInstance = new SharedFacebook();
@@ -146,10 +143,7 @@ public class SharedFacebook extends Facebook {
     }
 
     static {
-        new ExtensionLoader().run();
-
-        new PluginLoader().run();
-        new CryptoPluginLoader().run();
+        new LibraryLoader().run();
 
         registerCompatibleMetaFactories();
     }

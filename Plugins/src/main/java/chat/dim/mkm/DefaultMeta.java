@@ -33,9 +33,9 @@ package chat.dim.mkm;
 import java.util.HashMap;
 import java.util.Map;
 
-import chat.dim.crypto.VerifyKey;
-import chat.dim.format.TransportableData;
 import chat.dim.protocol.Address;
+import chat.dim.protocol.TransportableData;
+import chat.dim.protocol.VerifyKey;
 
 /**
  *  Default Meta to build ID with 'name@address'

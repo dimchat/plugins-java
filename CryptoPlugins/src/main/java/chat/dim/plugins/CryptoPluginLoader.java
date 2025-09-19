@@ -36,45 +36,30 @@ import org.bouncycastle.crypto.digests.KeccakDigest;
 import org.bouncycastle.crypto.digests.RIPEMD160Digest;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
-import chat.dim.crypto.AsymmetricAlgorithms;
 import chat.dim.crypto.ECCPrivateKey;
 import chat.dim.crypto.ECCPublicKey;
-import chat.dim.crypto.PrivateKey;
-import chat.dim.crypto.PublicKey;
 import chat.dim.crypto.RSAPrivateKey;
 import chat.dim.crypto.RSAPublicKey;
-import chat.dim.digest.DataDigester;
-import chat.dim.digest.Keccak256;
+import chat.dim.digest.KECCAK256;
+import chat.dim.digest.MessageDigester;
 import chat.dim.digest.RIPEMD160;
 import chat.dim.format.JSON;
 import chat.dim.format.ObjectCoder;
+import chat.dim.protocol.AsymmetricAlgorithms;
+import chat.dim.protocol.PrivateKey;
+import chat.dim.protocol.PublicKey;
 import chat.dim.utils.CryptoUtils;
 
-public class CryptoPluginLoader implements Runnable {
-
-    private boolean loaded = false;
-
-    @Override
-    public void run() {
-        if (loaded) {
-            // no need to load it again
-            return;
-        } else {
-            // mark it to loaded
-            loaded = true;
-        }
-        // try to load all plugins
-        load();
-    }
+public class CryptoPluginLoader {
 
     /**
      *  Register core factories
      */
-    protected void load() {
+    public void load() {
         prepare();
 
-        registerDataCoders();
-        registerDataDigesters();
+        registerCoders();
+        registerDigesters();
 
         registerAsymmetricKeyFactories();
 
@@ -101,7 +86,7 @@ public class CryptoPluginLoader implements Runnable {
     /**
      *  Data coders
      */
-    protected void registerDataCoders() {
+    protected void registerCoders() {
 
         registerJSONCoder();
 
@@ -128,9 +113,9 @@ public class CryptoPluginLoader implements Runnable {
     }
 
     /**
-     *  Data digesters
+     *  Message digesters
      */
-    protected void registerDataDigesters() {
+    protected void registerDigesters() {
 
         registerRIPEMD160Digester();
 
@@ -138,7 +123,7 @@ public class CryptoPluginLoader implements Runnable {
 
     }
     protected void registerRIPEMD160Digester() {
-        RIPEMD160.digester = new DataDigester() {
+        RIPEMD160.digester = new MessageDigester() {
             @Override
             public byte[] digest(byte[] data) {
                 RIPEMD160Digest digest = new RIPEMD160Digest();
@@ -150,7 +135,7 @@ public class CryptoPluginLoader implements Runnable {
         };
     }
     protected void registerKeccak256Digester() {
-        Keccak256.digester = new DataDigester() {
+        KECCAK256.digester = new MessageDigester() {
             @Override
             public byte[] digest(byte[] data) {
                 KeccakDigest digest = new KeccakDigest(256);

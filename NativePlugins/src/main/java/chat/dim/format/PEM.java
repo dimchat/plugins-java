@@ -34,7 +34,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
-import chat.dim.crypto.AsymmetricAlgorithms;
+import chat.dim.protocol.AsymmetricAlgorithms;
 
 public final class PEM {
 

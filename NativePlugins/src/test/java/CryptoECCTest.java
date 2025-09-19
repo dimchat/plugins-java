@@ -5,15 +5,15 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.Map;
 
-import chat.dim.crypto.AsymmetricAlgorithms;
-import chat.dim.crypto.PrivateKey;
-import chat.dim.crypto.PublicKey;
 import chat.dim.digest.RIPEMD160;
 import chat.dim.digest.SHA256;
 import chat.dim.format.Hex;
 import chat.dim.mkm.BTCAddress;
 import chat.dim.mkm.ETHAddress;
 import chat.dim.protocol.Address;
+import chat.dim.protocol.AsymmetricAlgorithms;
+import chat.dim.protocol.PrivateKey;
+import chat.dim.protocol.PublicKey;
 import chat.dim.Facebook;
 
 public class CryptoECCTest {

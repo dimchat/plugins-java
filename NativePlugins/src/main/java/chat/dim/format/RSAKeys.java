@@ -28,7 +28,7 @@ package chat.dim.format;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 
-import chat.dim.crypto.AsymmetricAlgorithms;
+import chat.dim.protocol.AsymmetricAlgorithms;
 
 public final class RSAKeys {
 

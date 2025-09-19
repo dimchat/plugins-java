@@ -37,6 +37,7 @@ import java.security.SignatureException;
 import java.util.Map;
 
 import chat.dim.format.RSAKeys;
+import chat.dim.protocol.EncryptKey;
 import chat.dim.utils.CryptoUtils;
 
 /**

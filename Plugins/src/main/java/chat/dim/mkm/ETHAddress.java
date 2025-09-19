@@ -30,7 +30,7 @@
  */
 package chat.dim.mkm;
 
-import chat.dim.digest.Keccak256;
+import chat.dim.digest.KECCAK256;
 import chat.dim.format.Hex;
 import chat.dim.protocol.Address;
 import chat.dim.protocol.EntityType;
@@ -63,7 +63,7 @@ public final class ETHAddress extends ConstantString implements Address {
     // https://eips.ethereum.org/EIPS/eip-55
     private static String eip55(String hex) {
         StringBuilder sb = new StringBuilder();
-        byte[] hash = Keccak256.digest(hex.getBytes());
+        byte[] hash = KECCAK256.digest(hex.getBytes());
         char ch;
         for (int i = 0; i < 40; ++i) {
             ch = hex.charAt(i);
@@ -132,7 +132,7 @@ public final class ETHAddress extends ConstantString implements Address {
         }
         assert fingerprint.length == 64 : "key data length error: " + fingerprint.length;
         // 1. digest = keccak256(fingerprint);
-        byte[] digest = Keccak256.digest(fingerprint);
+        byte[] digest = KECCAK256.digest(fingerprint);
         // 2. address = hex_encode(digest.suffix(20));
         byte[] tail = new byte[20];
         System.arraycopy(digest, digest.length - 20, tail, 0, 20);

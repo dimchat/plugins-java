@@ -37,7 +37,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.util.Random;
 
-import chat.dim.format.TransportableData;
+import chat.dim.protocol.SymmetricAlgorithms;
+import chat.dim.protocol.TransportableData;
 
 /**
  *  AES Key

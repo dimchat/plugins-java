@@ -32,10 +32,10 @@ package chat.dim.mkm;
 
 import java.util.Map;
 
-import chat.dim.crypto.VerifyKey;
-import chat.dim.format.TransportableData;
 import chat.dim.protocol.Address;
 import chat.dim.protocol.EntityType;
+import chat.dim.protocol.TransportableData;
+import chat.dim.protocol.VerifyKey;
 
 /**
  *  Meta to build ETH address for ID

@@ -28,7 +28,9 @@ package chat.dim.format;
 import java.net.URI;
 import java.util.Map;
 
-import chat.dim.crypto.DecryptKey;
+import chat.dim.protocol.DecryptKey;
+import chat.dim.protocol.PortableNetworkFile;
+import chat.dim.protocol.TransportableData;
 import chat.dim.type.Dictionary;
 
 /**

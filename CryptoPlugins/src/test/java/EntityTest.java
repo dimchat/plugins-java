@@ -7,10 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import chat.dim.crypto.AsymmetricAlgorithms;
-import chat.dim.crypto.PrivateKey;
-import chat.dim.crypto.PublicKey;
-import chat.dim.crypto.SignKey;
 import chat.dim.mkm.BTCAddress;
 import chat.dim.mkm.BaseGroup;
 import chat.dim.mkm.BaseUser;
@@ -18,11 +14,15 @@ import chat.dim.mkm.Group;
 import chat.dim.mkm.MetaUtils;
 import chat.dim.mkm.User;
 import chat.dim.protocol.Address;
+import chat.dim.protocol.AsymmetricAlgorithms;
 import chat.dim.protocol.Document;
 import chat.dim.protocol.EntityType;
 import chat.dim.protocol.ID;
 import chat.dim.protocol.Meta;
 import chat.dim.protocol.MetaType;
+import chat.dim.protocol.PrivateKey;
+import chat.dim.protocol.PublicKey;
+import chat.dim.protocol.SignKey;
 import chat.dim.Facebook;
 
 public class EntityTest {

@@ -34,6 +34,7 @@ import chat.dim.digest.SHA256;
 import chat.dim.ecc.Secp256k1;
 import chat.dim.format.Hex;
 import chat.dim.format.PEM;
+import chat.dim.protocol.PublicKey;
 import chat.dim.utils.CryptoUtils;
 
 /**

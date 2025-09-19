@@ -5,10 +5,7 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.Map;
 
-import chat.dim.crypto.DecryptKey;
-import chat.dim.crypto.EncryptKey;
-import chat.dim.crypto.PrivateKey;
-import chat.dim.digest.Keccak256;
+import chat.dim.digest.KECCAK256;
 import chat.dim.digest.RIPEMD160;
 import chat.dim.digest.SHA256;
 import chat.dim.format.Base58;
@@ -17,10 +14,13 @@ import chat.dim.format.Hex;
 import chat.dim.format.JSON;
 import chat.dim.format.UTF8;
 import chat.dim.mkm.MetaUtils;
+import chat.dim.protocol.DecryptKey;
+import chat.dim.protocol.EncryptKey;
 import chat.dim.protocol.EntityType;
 import chat.dim.protocol.ID;
 import chat.dim.protocol.Meta;
 import chat.dim.protocol.MetaType;
+import chat.dim.protocol.PrivateKey;
 import chat.dim.Facebook;
 
 public class CryptoTest {
@@ -55,9 +55,9 @@ public class CryptoTest {
 
     private void testKeccak(String string, String exp) {
         byte[] data = UTF8.encode(string);
-        byte[] hash = Keccak256.digest(data);
+        byte[] hash = KECCAK256.digest(data);
         String res = Hex.encode(hash);
-        Log.info("Keccak256 ( " + string + " ):\n\t" + res);
+        Log.info("KECCAK256 ( " + string + " ):\n\t" + res);
         Assert.assertEquals(exp, res);
     }
 

@@ -40,6 +40,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import chat.dim.format.RSAKeys;
+import chat.dim.protocol.AsymmetricAlgorithms;
+import chat.dim.protocol.DecryptKey;
+import chat.dim.protocol.EncryptKey;
+import chat.dim.protocol.PublicKey;
 import chat.dim.utils.CryptoUtils;
 
 /**

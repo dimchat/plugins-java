@@ -33,9 +33,9 @@ package chat.dim.dkd;
 import java.util.Map;
 
 import chat.dim.dkd.cmd.BaseCommand;
-import chat.dim.plugins.CommandHelper;
-import chat.dim.plugins.GeneralCommandHelper;
-import chat.dim.plugins.SharedCommandExtensions;
+import chat.dim.ext.CommandHelper;
+import chat.dim.ext.GeneralCommandHelper;
+import chat.dim.ext.SharedCommandExtensions;
 import chat.dim.protocol.Command;
 import chat.dim.protocol.Content;
 

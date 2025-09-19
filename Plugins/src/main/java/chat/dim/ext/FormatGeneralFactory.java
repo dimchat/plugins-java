@@ -23,7 +23,7 @@
  * SOFTWARE.
  * ==============================================================================
  */
-package chat.dim.plugins;
+package chat.dim.ext;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -31,11 +31,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import chat.dim.crypto.DecryptKey;
-import chat.dim.format.EncodeAlgorithms;
 import chat.dim.format.JSONMap;
-import chat.dim.format.PortableNetworkFile;
-import chat.dim.format.TransportableData;
+import chat.dim.protocol.DecryptKey;
+import chat.dim.protocol.EncodeAlgorithms;
+import chat.dim.protocol.PortableNetworkFile;
+import chat.dim.protocol.TransportableData;
 import chat.dim.type.Converter;
 import chat.dim.type.Mapper;
 

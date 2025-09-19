@@ -32,14 +32,14 @@ package chat.dim.mkm;
 
 import java.util.Map;
 
-import chat.dim.crypto.PrivateKey;
-import chat.dim.crypto.SignKey;
-import chat.dim.crypto.VerifyKey;
-import chat.dim.format.TransportableData;
+import chat.dim.ext.SharedAccountExtensions;
 import chat.dim.format.UTF8;
-import chat.dim.plugins.SharedAccountExtensions;
 import chat.dim.protocol.Meta;
 import chat.dim.protocol.MetaType;
+import chat.dim.protocol.PrivateKey;
+import chat.dim.protocol.SignKey;
+import chat.dim.protocol.TransportableData;
+import chat.dim.protocol.VerifyKey;
 
 /**
  *  Base Meta Factory

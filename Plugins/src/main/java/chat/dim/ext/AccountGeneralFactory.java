@@ -28,19 +28,19 @@
  * SOFTWARE.
  * ==============================================================================
  */
-package chat.dim.plugins;
+package chat.dim.ext;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import chat.dim.crypto.SignKey;
-import chat.dim.crypto.VerifyKey;
-import chat.dim.format.TransportableData;
 import chat.dim.protocol.Address;
 import chat.dim.protocol.Document;
 import chat.dim.protocol.DocumentType;
 import chat.dim.protocol.ID;
 import chat.dim.protocol.Meta;
+import chat.dim.protocol.SignKey;
+import chat.dim.protocol.TransportableData;
+import chat.dim.protocol.VerifyKey;
 import chat.dim.type.Converter;
 import chat.dim.type.Wrapper;
 

@@ -33,61 +33,44 @@ import java.util.HashMap;
 import java.util.Map;
 
 import chat.dim.crypto.AESKey;
-import chat.dim.crypto.DecryptKey;
 import chat.dim.crypto.PlainKey;
-import chat.dim.crypto.SymmetricAlgorithms;
-import chat.dim.crypto.SymmetricKey;
-import chat.dim.digest.DataDigester;
-import chat.dim.digest.MD5;
-import chat.dim.digest.SHA1;
+import chat.dim.digest.MessageDigester;
 import chat.dim.digest.SHA256;
 import chat.dim.format.Base58;
 import chat.dim.format.Base64;
 import chat.dim.format.Base64Data;
 import chat.dim.format.BaseNetworkFile;
 import chat.dim.format.DataCoder;
-import chat.dim.format.EncodeAlgorithms;
 import chat.dim.format.Hex;
 import chat.dim.format.HexCoder;
-import chat.dim.format.PortableNetworkFile;
 import chat.dim.format.StringCoder;
-import chat.dim.format.TransportableData;
 import chat.dim.format.UTF8;
 import chat.dim.mkm.BaseAddressFactory;
 import chat.dim.mkm.BaseMetaFactory;
 import chat.dim.mkm.GeneralDocumentFactory;
 import chat.dim.mkm.IdentifierFactory;
 import chat.dim.protocol.Address;
+import chat.dim.protocol.DecryptKey;
 import chat.dim.protocol.Document;
 import chat.dim.protocol.DocumentType;
+import chat.dim.protocol.EncodeAlgorithms;
 import chat.dim.protocol.ID;
 import chat.dim.protocol.Meta;
 import chat.dim.protocol.MetaType;
+import chat.dim.protocol.PortableNetworkFile;
+import chat.dim.protocol.SymmetricAlgorithms;
+import chat.dim.protocol.SymmetricKey;
+import chat.dim.protocol.TransportableData;
 
-public class PluginLoader implements Runnable {
-
-    private boolean loaded = false;
-
-    @Override
-    public void run() {
-        if (loaded) {
-            // no need to load it again
-            return;
-        } else {
-            // mark it to loaded
-            loaded = true;
-        }
-        // try to load all plugins
-        load();
-    }
+public class PluginLoader {
 
     /**
      *  Register plugins
      */
-    protected void load() {
+    public void load() {
 
-        registerDataCoders();
-        registerDataDigesters();
+        registerCoders();
+        registerDigesters();
 
         registerSymmetricKeyFactories();
 
@@ -98,7 +81,7 @@ public class PluginLoader implements Runnable {
     /**
      *  Data coders
      */
-    protected void registerDataCoders() {
+    protected void registerCoders() {
 
         registerBase58Coder();
         registerBase64Coder();
@@ -211,58 +194,16 @@ public class PluginLoader implements Runnable {
     }
 
     /**
-     *  Data digesters
+     *  Message digesters
      */
-    protected void registerDataDigesters() {
-
-        registerMD5Digester();
-
-        registerSHA1Digester();
+    protected void registerDigesters() {
 
         registerSHA256Digester();
 
     }
-    protected void registerMD5Digester() {
-        // MD5
-        MD5.digester = new DataDigester() {
-
-            @Override
-            public byte[] digest(byte[] data) {
-                MessageDigest md;
-                try {
-                    md = MessageDigest.getInstance("MD5");
-                } catch (NoSuchAlgorithmException e) {
-                    e.printStackTrace();
-                    return null;
-                }
-                md.reset();
-                md.update(data);
-                return md.digest();
-            }
-        };
-    }
-    protected void registerSHA1Digester() {
-        // SHA1
-        SHA1.digester = new DataDigester() {
-
-            @Override
-            public byte[] digest(byte[] data) {
-                MessageDigest md;
-                try {
-                    md = MessageDigest.getInstance("SHA-1");
-                } catch (NoSuchAlgorithmException e) {
-                    e.printStackTrace();
-                    return null;
-                }
-                md.reset();
-                md.update(data);
-                return md.digest();
-            }
-        };
-    }
     protected void registerSHA256Digester() {
         // SHA256
-        SHA256.digester = new DataDigester() {
+        SHA256.digester = new MessageDigester() {
 
             @Override
             public byte[] digest(byte[] data) {
