@@ -114,12 +114,6 @@ public class SharedFacebook extends Facebook {
         return null;
     }
 
-    @Override
-    public List<ID> getAssistants(ID group) {
-        // TODO:
-        return null;
-    }
-
     /**
      *  Meta factories
      */

@@ -52,13 +52,10 @@ import chat.dim.dkd.file.BaseFileContent;
 import chat.dim.dkd.file.ImageFileContent;
 import chat.dim.dkd.file.VideoFileContent;
 import chat.dim.dkd.group.ExpelGroupCommand;
-import chat.dim.dkd.group.FireGroupCommand;
-import chat.dim.dkd.group.HireGroupCommand;
 import chat.dim.dkd.group.InviteGroupCommand;
 import chat.dim.dkd.group.JoinGroupCommand;
 import chat.dim.dkd.group.QuitGroupCommand;
 import chat.dim.dkd.group.ResetGroupCommand;
-import chat.dim.dkd.group.ResignGroupCommand;
 import chat.dim.ext.AccountGeneralFactory;
 import chat.dim.ext.CommandGeneralFactory;
 import chat.dim.ext.CryptoKeyGeneralFactory;
@@ -265,10 +262,6 @@ public class ExtensionLoader {
         // 'query' is deprecated
         //setCommandFactory(GroupCommand.QUERY, QueryGroupCommand::new);
         setCommandFactory(GroupCommand.RESET,   ResetGroupCommand::new);
-        // Group Admin Commands
-        setCommandFactory(GroupCommand.HIRE,    HireGroupCommand::new);
-        setCommandFactory(GroupCommand.FIRE,    FireGroupCommand::new);
-        setCommandFactory(GroupCommand.RESIGN,  ResignGroupCommand::new);
     }
 
 }
