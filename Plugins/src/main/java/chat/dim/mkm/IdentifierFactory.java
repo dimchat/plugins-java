@@ -45,14 +45,14 @@ public class IdentifierFactory implements ID.Factory {
     protected final Map<String, ID> identifiers = new HashMap<>();
 
     @Override
-    public ID generateIdentifier(Meta meta, int network, String terminal) {
+    public ID generateID(Meta meta, int network, String terminal) {
         Address address = Address.generate(meta, network);
         assert address != null : "failed to generate ID with meta: " + meta.toMap();
         return ID.create(meta.getSeed(), address, terminal);
     }
 
     @Override
-    public ID createIdentifier(String name, Address address, String terminal) {
+    public ID createID(String name, Address address, String terminal) {
         String identifier = Identifier.concat(name, address, terminal);
         ID did = identifiers.get(identifier);
         if (did == null) {
@@ -63,7 +63,7 @@ public class IdentifierFactory implements ID.Factory {
     }
 
     @Override
-    public ID parseIdentifier(String identifier) {
+    public ID parseID(String identifier) {
         ID did = identifiers.get(identifier);
         if (did == null) {
             did = parse(identifier);

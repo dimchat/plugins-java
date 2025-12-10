@@ -48,7 +48,7 @@ import chat.dim.type.Wrapper;
  *  Account GeneralFactory
  */
 public class AccountGeneralFactory implements GeneralAccountHelper,
-                                              AddressHelper, IdentifierHelper,
+                                              AddressHelper, IDHelper,
                                               MetaHelper, DocumentHelper {
 
     private Address.Factory addressFactory = null;
@@ -73,13 +73,13 @@ public class AccountGeneralFactory implements GeneralAccountHelper,
             return defaultValue;
         }
         // get type for did
-        ID identifier = ID.parse(doc.get("did"));
-        if (identifier == null) {
+        ID did = ID.parse(doc.get("did"));
+        if (did == null) {
             assert false : "document error: " + doc;
             return null;
-        } else if (identifier.isUser()) {
+        } else if (did.isUser()) {
             return DocumentType.VISA;
-        } else if (identifier.isGroup()) {
+        } else if (did.isGroup()) {
             return DocumentType.BULLETIN;
         } else {
             return DocumentType.PROFILE;
@@ -129,44 +129,44 @@ public class AccountGeneralFactory implements GeneralAccountHelper,
     //
 
     @Override
-    public void setIdentifierFactory(ID.Factory factory) {
+    public void setIDFactory(ID.Factory factory) {
         idFactory = factory;
     }
 
     @Override
-    public ID.Factory getIdentifierFactory() {
+    public ID.Factory getIDFactory() {
         return idFactory;
     }
 
     @Override
-    public ID parseIdentifier(Object identifier) {
-        if (identifier == null) {
+    public ID parseID(Object did) {
+        if (did == null) {
             return null;
-        } else if (identifier instanceof ID) {
-            return (ID) identifier;
+        } else if (did instanceof ID) {
+            return (ID) did;
         }
-        String str = Wrapper.getString(identifier);
+        String str = Wrapper.getString(did);
         if (str == null) {
-            assert false : "ID error: " + identifier;
+            assert false : "ID error: " + did;
             return null;
         }
-        ID.Factory factory = getIdentifierFactory();
+        ID.Factory factory = getIDFactory();
         assert factory != null : "ID factory not ready";
-        return factory.parseIdentifier(str);
+        return factory.parseID(str);
     }
 
     @Override
-    public ID createIdentifier(String name, Address address, String terminal) {
-        ID.Factory factory = getIdentifierFactory();
+    public ID createID(String name, Address address, String terminal) {
+        ID.Factory factory = getIDFactory();
         assert factory != null : "ID factory not ready";
-        return factory.createIdentifier(name, address, terminal);
+        return factory.createID(name, address, terminal);
     }
 
     @Override
-    public ID generateIdentifier(Meta meta, int network, String terminal) {
-        ID.Factory factory = getIdentifierFactory();
+    public ID generateID(Meta meta, int network, String terminal) {
+        ID.Factory factory = getIDFactory();
         assert factory != null : "ID factory not ready";
-        return factory.generateIdentifier(meta, network, terminal);
+        return factory.generateID(meta, network, terminal);
     }
 
     //
@@ -238,10 +238,10 @@ public class AccountGeneralFactory implements GeneralAccountHelper,
     }
 
     @Override
-    public Document createDocument(String type, ID identifier, String data, TransportableData signature) {
+    public Document createDocument(String type, ID did, String data, TransportableData signature) {
         Document.Factory factory = getDocumentFactory(type);
         assert factory != null : "document type not found: " + type;
-        return factory.createDocument(identifier, data, signature);
+        return factory.createDocument(did, data, signature);
     }
 
     @Override

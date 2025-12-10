@@ -50,13 +50,13 @@ public class GeneralDocumentFactory implements Document.Factory {
         type = docType;
     }
 
-    protected String getType(String docType, ID identifier) {
+    protected String getType(String docType, ID did) {
         assert docType != null && docType.length() > 0 : "document type empty";
         if (!docType.equals("*")) {
             return docType;
-        } else if (identifier.isGroup()) {
+        } else if (did.isGroup()) {
             return DocumentType.BULLETIN;
-        } else if (identifier.isUser()) {
+        } else if (did.isUser()) {
             return DocumentType.VISA;
         } else {
             return DocumentType.PROFILE;
@@ -64,35 +64,35 @@ public class GeneralDocumentFactory implements Document.Factory {
     }
 
     @Override
-    public Document createDocument(ID identifier, String data, TransportableData signature) {
-        String docType = getType(type, identifier);
+    public Document createDocument(ID did, String data, TransportableData signature) {
+        String docType = getType(type, did);
         if (data == null || data.isEmpty()) {
-            assert signature == null : "document error: " + identifier + ", signature: " + signature;
+            assert signature == null : "document error: " + did + ", signature: " + signature;
             // create empty document
             switch (docType) {
 
                 case DocumentType.VISA:
-                    return new BaseVisa(identifier);
+                    return new BaseVisa(did);
 
                 case DocumentType.BULLETIN:
-                    return new BaseBulletin(identifier);
+                    return new BaseBulletin(did);
 
                 default:
-                    return new BaseDocument(identifier, docType);
+                    return new BaseDocument(did, docType);
             }
         } else {
-            assert signature != null : "document error: " + identifier + ", data: " + data;
+            assert signature != null : "document error: " + did + ", data: " + data;
             // create document with data & signature from local storage
             switch (docType) {
 
                 case DocumentType.VISA:
-                    return new BaseVisa(identifier, data, signature);
+                    return new BaseVisa(did, data, signature);
 
                 case DocumentType.BULLETIN:
-                    return new BaseBulletin(identifier, data, signature);
+                    return new BaseBulletin(did, data, signature);
 
                 default:
-                    return new BaseDocument(identifier, docType, data, signature);
+                    return new BaseDocument(did, docType, data, signature);
             }
         }
     }
@@ -100,8 +100,8 @@ public class GeneralDocumentFactory implements Document.Factory {
     @Override
     public Document parseDocument(Map<String, Object> doc) {
         // check 'did', 'data', 'signature'
-        ID identifier = ID.parse(doc.get("did"));
-        if (identifier == null) {
+        ID did = ID.parse(doc.get("did"));
+        if (did == null) {
             assert false : "document ID not found : " + doc;
             return null;
         } else if (doc.get("data") == null || doc.get("signature") == null) {
@@ -112,7 +112,7 @@ public class GeneralDocumentFactory implements Document.Factory {
         }
         String docType = SharedAccountExtensions.helper.getDocumentType(doc, null);
         if (docType == null) {
-            docType = getType("*", identifier);
+            docType = getType("*", did);
         }
         // create with document type
         switch (docType) {

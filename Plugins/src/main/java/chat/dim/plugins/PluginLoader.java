@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import chat.dim.crypto.AESKey;
+import chat.dim.crypto.BaseKey;
 import chat.dim.crypto.PlainKey;
 import chat.dim.digest.MessageDigester;
 import chat.dim.digest.SHA256;
@@ -266,6 +267,13 @@ public class PluginLoader {
 
             @Override
             public SymmetricKey parseSymmetricKey(Map<String, Object> key) {
+                // check 'algorithm'
+                String algorithm = BaseKey.getKeyAlgorithm(key);
+                if (!SymmetricAlgorithms.PLAIN.equals(algorithm)) {
+                    // algorithm not matched
+                    assert false : "Plain key error: " + key;
+                    return null;
+                }
                 return PlainKey.getInstance();
             }
         });

@@ -179,7 +179,7 @@ package chat.dim.compat;
 import chat.dim.plugins.PluginLoader;
 import chat.dim.protocol.*;
 
-public class CommonPluginLoader extends PluginLoader {
+public class CompatiblePluginLoader extends PluginLoader {
 
     @Override
     protected void registerAddressFactory() {
@@ -209,6 +209,45 @@ public class CommonPluginLoader extends PluginLoader {
 }
 ```
 
+### ExtensionLoader
+
+```java
+import chat.dim.dkd.AppCustomizedContent;
+import chat.dim.plugins.ExtensionLoader;
+import chat.dim.protocol.*;
+
+
+/**
+ *  Extensions Loader
+ *  ~~~~~~~~~~~~~~~~~
+ */
+public class CommonExtensionLoader extends ExtensionLoader {
+
+    @Override
+    protected void registerCustomizedFactories() {
+
+        // Application Customized
+        setContentFactory(ContentType.CUSTOMIZED, "customized", AppCustomizedContent::new);
+        setContentFactory(ContentType.APPLICATION, "application", AppCustomizedContent::new);
+
+        //super.registerCustomizedFactories();
+    }
+
+    /**
+     *  Command factories
+     */
+    @Override
+    protected void registerCommandFactories() {
+        super.registerCommandFactories();
+
+        // Handshake
+        setCommandFactory(HandshakeCommand.HANDSHAKE, HandshakeCommand::new);
+
+    }
+
+}
+```
+
 ## Usage
 
 You must load all plugins before your business run:
@@ -223,17 +262,18 @@ public class LibraryLoader implements Runnable {
 
     private final ExtensionLoader extensionLoader;
     private final PluginLoader pluginLoader;
+    private bool loaded = false;
 
     public LibraryLoader(ExtensionLoader extensionLoader, PluginLoader pluginLoader) {
 
         if (extensionLoader == null) {
-            this.extensionLoader = new ExtensionLoader();
+            this.extensionLoader = new CommonExtensionLoader();
         } else {
             this.extensionLoader = extensionLoader;
         }
 
         if (pluginLoader == null) {
-            this.pluginLoader = new CommonPluginLoader();
+            this.pluginLoader = new CompatiblePluginLoader();
         } else {
             this.pluginLoader = pluginLoader;
         }
@@ -241,8 +281,20 @@ public class LibraryLoader implements Runnable {
 
     @Override
     public void run() {
-        extensionLoader.run();
-        pluginLoader.run();
+        if (loaded) {
+            // no need to load it again
+            return;
+        } else {
+            // mark it to loaded
+            loaded = true;
+        }
+        // try to load all plugins
+        load();
+    }
+    
+    protected void load() {
+        extensionLoader.load();
+        pluginLoader.load();
     }
     
     public static void main(String[] args) {
