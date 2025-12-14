@@ -48,9 +48,9 @@ public class BaseMetaFactory implements Meta.Factory {
 
     protected final String type;
 
-    public BaseMetaFactory(String algorithm) {
+    public BaseMetaFactory(String version) {
         super();
-        type = algorithm;
+        type = version;
     }
 
     @Override
@@ -69,67 +69,62 @@ public class BaseMetaFactory implements Meta.Factory {
 
     @Override
     public Meta createMeta(VerifyKey key, String seed, TransportableData fingerprint) {
+        String version = type;
         Meta out;
-        switch (type) {
+        switch (version) {
 
             case MetaType.MKM:
-            case "mkm":
-                out = new DefaultMeta(type, key, seed, fingerprint);
+                out = new DefaultMeta(version, key, seed, fingerprint);
                 break;
 
             case MetaType.BTC:
-            case "btc":
-                out = new BTCMeta(type, key);
+                out = new BTCMeta(version, key);
                 break;
 
             case MetaType.ETH:
-            case "eth":
-                out = new ETHMeta(type, key);
+                out = new ETHMeta(version, key);
                 break;
 
             default:
-                throw new IllegalArgumentException("unknown meta type: " + type);
+                throw new IllegalArgumentException("unknown meta type: " + version);
         }
         assert out.isValid() : "meta error: " + out;
         return out;
     }
 
     @Override
-    public Meta parseMeta(Map<String, Object> meta) {
-        /*/
+    public Meta parseMeta(Map<String, Object> info) {
         // check 'type', 'key', 'seed', 'fingerprint'
-        if (meta.get("type") == null || meta.get("key") == null) {
+        if (info.get("type") == null || info.get("key") == null) {
             // meta.type should not be empty
             // meta.key should not be empty
-            assert false : "meta error: " + meta;
+            assert false : "meta error: " + info;
             return null;
-        } else if (meta.get("seed") == null) {
-            if (meta.get("fingerprint") == null) {
-                assert false : "meta error: " + meta;
+        } else if (info.get("seed") == null) {
+            if (info.get("fingerprint") == null) {
+                assert false : "meta error: " + info;
                 return null;
             }
-        } else if (meta.get("fingerprint") == null) {
-            assert false : "meta error: " + meta;
+        } else if (info.get("fingerprint") == null) {
+            assert false : "meta error: " + info;
             return null;
         }
-        /*/
+
+        // create meta for type
         Meta out;
-        String version = SharedAccountExtensions.helper.getMetaType(meta, "");
+        String version = getMetaType(info);
         switch (version) {
 
             case MetaType.MKM:
-            case "mkm":
-                out = new DefaultMeta(meta);
+                out = new DefaultMeta(info);
                 break;
 
             case MetaType.BTC:
-            case "btc":
-                out = new BTCMeta(meta);
+                out = new BTCMeta(info);
                 break;
 
             case MetaType.ETH:
-            case "eth":
-                out = new ETHMeta(meta);
+                out = new ETHMeta(info);
                 break;
 
             default:
@@ -138,7 +133,17 @@ public class BaseMetaFactory implements Meta.Factory {
         if (out.isValid()) {
             return out;
         }
-        assert false : "meta error: " + meta;
+        assert false : "meta error: " + info;
         return null;
     }
+
+    protected String getMetaType(Map<String, Object> info) {
+        // get type from meta info
+        String version = SharedAccountExtensions.helper.getMetaType(info, null);
+        if (version == null) {
+            version = "";
+        }
+        return version;
+    }
+
 }

@@ -50,100 +50,109 @@ public class GeneralDocumentFactory implements Document.Factory {
         type = docType;
     }
 
-    protected String getType(String docType, ID did) {
-        assert docType != null && docType.length() > 0 : "document type empty";
-        if (!docType.equals("*")) {
-            return docType;
-        } else if (did.isGroup()) {
-            return DocumentType.BULLETIN;
-        } else if (did.isUser()) {
-            return DocumentType.VISA;
-        } else {
-            return DocumentType.PROFILE;
-        }
-    }
-
     @Override
-    public Document createDocument(ID did, String data, TransportableData signature) {
-        String docType = getType(type, did);
-        Document doc;
+    public Document createDocument(String data, TransportableData signature) {
         if (data == null || data.isEmpty()) {
-            assert signature == null : "document error: " + did + ", signature: " + signature;
+            assert signature == null : "document error: " + data + ", signature: " + signature;
             // create empty document
-            switch (docType) {
-
-                case DocumentType.VISA:
-                    doc = new BaseVisa(did);
-                    break;
-
-                case DocumentType.BULLETIN:
-                    doc = new BaseBulletin();
-                    doc.setString("did", did);
-                    break;
-
-                default:
-                    doc = new BaseDocument(docType);
-                    doc.setString("did", did);
-                    break;
-            }
-        } else {
-            assert signature != null : "document error: " + did + ", data: " + data;
-            // create document with data & signature from local storage
-            switch (docType) {
-
-                case DocumentType.VISA:
-                    doc = new BaseVisa(did, data, signature);
-                    break;
-
-                case DocumentType.BULLETIN:
-                    doc = new BaseBulletin(data, signature);
-                    doc.setString("did", did);
-                    break;
-
-                default:
-                    doc = new BaseDocument(docType, data, signature);
-                    doc.setString("did", did);
-                    break;
-            }
+            return createEmptyDocument();
         }
-        return doc;
+        assert signature != null : "document error: " + data;
+        // create document with data & signature from local storage
+        return createValidDocument(data, signature);
+    }
+    protected Document createEmptyDocument() {
+        String docType = type;
+        Document out;
+        switch (docType) {
+
+            case DocumentType.VISA:
+                out = new BaseVisa();
+                break;
+
+            case DocumentType.BULLETIN:
+                out = new BaseBulletin();
+                break;
+
+            default:
+                out = new BaseDocument(docType);
+                break;
+        }
+        return out;
+    }
+    protected Document createValidDocument(String data, TransportableData signature) {
+        String docType = type;
+        Document out;
+        switch (docType) {
+
+            case DocumentType.VISA:
+                out = new BaseVisa(data, signature);
+                break;
+
+            case DocumentType.BULLETIN:
+                out = new BaseBulletin(data, signature);
+                break;
+
+            default:
+                out = new BaseDocument(docType, data, signature);
+                break;
+        }
+        assert out.isValid() : "document error: " + out;
+        return out;
     }
 
     @Override
     public Document parseDocument(Map<String, Object> info) {
         // check 'did', 'data', 'signature'
-        ID did = ID.parse(info.get("did"));
-        if (did == null) {
-            assert false : "document ID not found: " + info;
-            return null;
-        } else if (info.get("data") == null || info.get("signature") == null) {
+        if (info.get("data") == null || info.get("signature") == null) {
             // doc.data should not be empty
             // doc.signature should not be empty
             assert false : "document error: " + info;
             return null;
-        }
-        String docType = SharedAccountExtensions.helper.getDocumentType(info, null);
-        if (docType == null) {
-            docType = getType("*", did);
+        //} else if (info.get("did") == null) {
+        //    // meta.did should not be empty
+        //    assert false : "document error: " + info;
+        //    return null;
         }
 
-        Document doc;
-        // create with document type
+        // create document for type
+        Document out;
+        String docType = getDocumentType(info);
         switch (docType) {
 
             case DocumentType.VISA:
-                doc = new BaseVisa(info);
+                out = new BaseVisa(info);
                 break;
 
             case DocumentType.BULLETIN:
-                doc = new BaseBulletin(info);
+                out = new BaseBulletin(info);
                 break;
 
             default:
-                doc = new BaseDocument(info);
+                out = new BaseDocument(info);
                 break;
         }
-        return doc;
+        return out;
+    }
+
+    protected String getDocumentType(Map<String, Object> info) {
+        // get type from document info
+        String docType = SharedAccountExtensions.helper.getDocumentType(info, null);
+        if (docType == null) {
+            // get type for ID
+            ID did = ID.parse(info.get("did"));
+            if (did == null) {
+                assert false : "document ID not found: " + info;
+            } else if (did.isGroup()) {
+                docType = DocumentType.BULLETIN;
+            } else if (did.isUser()) {
+                docType = DocumentType.VISA;
+            } else {
+                docType = DocumentType.PROFILE;
+            }
+        }
+        assert docType.length() > 0 && !docType.equals("*") : "document type empty: " + info;
+        return docType;
     }
 
 }

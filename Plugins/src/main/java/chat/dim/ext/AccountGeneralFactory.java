@@ -238,10 +238,10 @@ public class AccountGeneralFactory implements GeneralAccountHelper,
     }
 
     @Override
-    public Document createDocument(String type, ID did, String data, TransportableData signature) {
+    public Document createDocument(String type, String data, TransportableData signature) {
         Document.Factory factory = getDocumentFactory(type);
         assert factory != null : "document type not found: " + type;
-        return factory.createDocument(did, data, signature);
+        return factory.createDocument(data, signature);
     }
 
     @Override
