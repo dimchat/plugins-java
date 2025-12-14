@@ -66,19 +66,25 @@ public class GeneralDocumentFactory implements Document.Factory {
     @Override
     public Document createDocument(ID did, String data, TransportableData signature) {
         String docType = getType(type, did);
+        Document doc;
         if (data == null || data.isEmpty()) {
             assert signature == null : "document error: " + did + ", signature: " + signature;
             // create empty document
             switch (docType) {
 
                 case DocumentType.VISA:
-                    return new BaseVisa(did);
+                    doc = new BaseVisa(did);
+                    break;
 
                 case DocumentType.BULLETIN:
-                    return new BaseBulletin(did);
+                    doc = new BaseBulletin();
+                    doc.setString("did", did);
+                    break;
 
                 default:
-                    return new BaseDocument(did, docType);
+                    doc = new BaseDocument(docType);
+                    doc.setString("did", did);
+                    break;
             }
         } else {
             assert signature != null : "document error: " + did + ", data: " + data;
@@ -86,46 +92,58 @@ public class GeneralDocumentFactory implements Document.Factory {
             switch (docType) {
 
                 case DocumentType.VISA:
-                    return new BaseVisa(did, data, signature);
+                    doc = new BaseVisa(did, data, signature);
+                    break;
 
                 case DocumentType.BULLETIN:
-                    return new BaseBulletin(did, data, signature);
+                    doc = new BaseBulletin(data, signature);
+                    doc.setString("did", did);
+                    break;
 
                 default:
-                    return new BaseDocument(did, docType, data, signature);
+                    doc = new BaseDocument(docType, data, signature);
+                    doc.setString("did", did);
+                    break;
             }
         }
+        return doc;
     }
 
     @Override
-    public Document parseDocument(Map<String, Object> doc) {
+    public Document parseDocument(Map<String, Object> info) {
         // check 'did', 'data', 'signature'
-        ID did = ID.parse(doc.get("did"));
+        ID did = ID.parse(info.get("did"));
         if (did == null) {
-            assert false : "document ID not found : " + doc;
+            assert false : "document ID not found: " + info;
             return null;
-        } else if (doc.get("data") == null || doc.get("signature") == null) {
+        } else if (info.get("data") == null || info.get("signature") == null) {
             // doc.data should not be empty
             // doc.signature should not be empty
-            assert false : "document error: " + doc;
+            assert false : "document error: " + info;
             return null;
         }
-        String docType = SharedAccountExtensions.helper.getDocumentType(doc, null);
+        String docType = SharedAccountExtensions.helper.getDocumentType(info, null);
         if (docType == null) {
             docType = getType("*", did);
         }
+
+        Document doc;
         // create with document type
         switch (docType) {
 
             case DocumentType.VISA:
-                return new BaseVisa(doc);
+                doc = new BaseVisa(info);
+                break;
 
             case DocumentType.BULLETIN:
-                return new BaseBulletin(doc);
+                doc = new BaseBulletin(info);
+                break;
 
             default:
-                return new BaseDocument(doc);
+                doc = new BaseDocument(info);
+                break;
         }
+        return doc;
     }
 
 }

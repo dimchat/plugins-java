@@ -36,7 +36,7 @@ public class EntityTest {
 
     private String getDocumentInfo(Document doc) {
         Map<String, Object> info = new HashMap<>();
-        info.put("did", doc.getIdentifier());
+        info.put("did", doc.getString("did"));
         info.put("name", doc.getProperty("name"));
         info.put("key", doc.getProperty("key"));
         info.put("avatar", doc.getProperty("avatar"));
