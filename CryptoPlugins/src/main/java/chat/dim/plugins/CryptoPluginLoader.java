@@ -175,9 +175,10 @@ public class CryptoPluginLoader {
 
             @Override
             public PrivateKey parsePrivateKey(Map<String, Object> key) {
-                // check 'data'
-                if (key.get("data") == null) {
+                // check 'data', 'algorithm'
+                if (key.get("data") == null || key.get("algorithm") == null) {
                     // key.data should not be empty
+                    // key.algorithm should not be empty
                     assert false : "RSA key error: " + key;
                     return null;
                 }
@@ -197,9 +198,10 @@ public class CryptoPluginLoader {
 
             @Override
             public PublicKey parsePublicKey(Map<String, Object> key) {
-                // check 'data'
-                if (key.get("data") == null) {
+                // check 'data', 'algorithm'
+                if (key.get("data") == null || key.get("algorithm") == null) {
                     // key.data should not be empty
+                    // key.algorithm should not be empty
                     assert false : "RSA key error: " + key;
                     return null;
                 }
@@ -234,9 +236,10 @@ public class CryptoPluginLoader {
 
             @Override
             public PrivateKey parsePrivateKey(Map<String, Object> key) {
-                // check 'data'
-                if (key.get("data") == null) {
+                // check 'data', 'algorithm'
+                if (key.get("data") == null || key.get("algorithm") == null) {
                     // key.data should not be empty
+                    // key.algorithm should not be empty
                     assert false : "ECC key error: " + key;
                     return null;
                 }
@@ -255,9 +258,10 @@ public class CryptoPluginLoader {
 
             @Override
             public PublicKey parsePublicKey(Map<String, Object> key) {
-                // check 'data'
-                if (key.get("data") == null) {
+                // check 'data', 'algorithm'
+                if (key.get("data") == null || key.get("algorithm") == null) {
                     // key.data should not be empty
+                    // key.algorithm should not be empty
                     assert false : "ECC key error: " + key;
                     return null;
                 }

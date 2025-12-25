@@ -35,7 +35,6 @@ import java.util.Map;
 import chat.dim.ext.SharedAccountExtensions;
 import chat.dim.protocol.Document;
 import chat.dim.protocol.DocumentType;
-import chat.dim.protocol.ID;
 import chat.dim.protocol.TransportableData;
 
 /**
@@ -110,14 +109,14 @@ public class GeneralDocumentFactory implements Document.Factory {
             assert false : "document error: " + info;
             return null;
         //} else if (info.get("did") == null) {
-        //    // meta.did should not be empty
+        //    // doc.did should not be empty
         //    assert false : "document error: " + info;
         //    return null;
         }
 
         // create document for type
         Document out;
-        String docType = getDocumentType(info);
+        String docType = SharedAccountExtensions.helper.getDocumentType(info, null);
         switch (docType) {
 
             case DocumentType.VISA:
@@ -133,26 +132,6 @@ public class GeneralDocumentFactory implements Document.Factory {
                 break;
         }
         return out;
-    }
-
-    protected String getDocumentType(Map<String, Object> info) {
-        // get type from document info
-        String docType = SharedAccountExtensions.helper.getDocumentType(info, null);
-        if (docType == null) {
-            // get type for ID
-            ID did = ID.parse(info.get("did"));
-            if (did == null) {
-                assert false : "document ID not found: " + info;
-            } else if (did.isGroup()) {
-                docType = DocumentType.BULLETIN;
-            } else if (did.isUser()) {
-                docType = DocumentType.VISA;
-            } else {
-                docType = DocumentType.PROFILE;
-            }
-        }
-        assert docType.length() > 0 && !docType.equals("*") : "document type empty: " + info;
-        return docType;
     }
 
 }

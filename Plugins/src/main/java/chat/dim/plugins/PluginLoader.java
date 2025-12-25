@@ -157,9 +157,9 @@ public class PluginLoader {
 
             @Override
             public PortableNetworkFile parsePortableNetworkFile(Map<String, Object> pnf) {
-                // check 'data', 'URL'
-                if (pnf.get("data") == null && pnf.get("URL") == null) {
-                    // pnf.data and pnf.URL should not be empty at the same time
+                // check 'data', 'URL', 'filename'
+                if (pnf.get("data") == null && pnf.get("URL") == null && pnf.get("filename") == null) {
+                    // pnf.data and pnf.URL and pnf.filename should not be empty at the same time
                     assert false : "PNF error: " + pnf;
                     return null;
                 }
@@ -244,9 +244,10 @@ public class PluginLoader {
 
             @Override
             public SymmetricKey parseSymmetricKey(Map<String, Object> key) {
-                // check 'data'
-                if (key.get("data") == null) {
+                // check 'data', 'algorithm'
+                if (key.get("data") == null || key.get("algorithm") == null) {
                     // key.data should not be empty
+                    // key.algorithm should not be empty
                     assert false : "AES key error: " + key;
                     return null;
                 }

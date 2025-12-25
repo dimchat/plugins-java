@@ -56,7 +56,7 @@ public class BaseMetaFactory implements Meta.Factory {
     @Override
     public Meta generateMeta(SignKey sKey, String seed) {
         TransportableData fingerprint;
-        if (seed == null || seed.length() == 0) {
+        if (seed == null || seed.isEmpty()) {
             fingerprint = null;
         } else {
             byte[] data = UTF8.encode(seed);
@@ -101,7 +101,7 @@ public class BaseMetaFactory implements Meta.Factory {
             assert false : "meta error: " + info;
             return null;
         } else if (info.get("seed") == null) {
-            if (info.get("fingerprint") == null) {
+            if (info.get("fingerprint") != null) {
                 assert false : "meta error: " + info;
                 return null;
             }
@@ -112,7 +112,7 @@ public class BaseMetaFactory implements Meta.Factory {
 
         // create meta for type
         Meta out;
-        String version = getMetaType(info);
+        String version = SharedAccountExtensions.helper.getMetaType(info, "");
         switch (version) {
 
             case MetaType.MKM:
@@ -135,15 +135,6 @@ public class BaseMetaFactory implements Meta.Factory {
         }
         assert false : "meta error: " + info;
         return null;
-    }
-
-    protected String getMetaType(Map<String, Object> info) {
-        // get type from meta info
-        String version = SharedAccountExtensions.helper.getMetaType(info, null);
-        if (version == null) {
-            version = "";
-        }
-        return version;
     }
 
 }

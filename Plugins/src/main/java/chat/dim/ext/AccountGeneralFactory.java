@@ -66,9 +66,9 @@ public class AccountGeneralFactory implements GeneralAccountHelper,
 
     @Override
     public String getDocumentType(Map<?, ?> doc, String defaultValue) {
-        Object type = doc.get("type");
-        if (type != null) {
-            return Converter.getString(type, defaultValue);
+        String type = Converter.getString(doc.get("type"), null);
+        if (type != null && type.length() > 0 && !type.equals("*")) {
+            return type;
         } else if (defaultValue != null) {
             return defaultValue;
         }
