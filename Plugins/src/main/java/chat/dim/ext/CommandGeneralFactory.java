@@ -33,10 +33,10 @@ package chat.dim.ext;
 import java.util.HashMap;
 import java.util.Map;
 
+import chat.dim.data.Converter;
+import chat.dim.data.Wrapper;
 import chat.dim.protocol.Command;
 import chat.dim.protocol.Content;
-import chat.dim.type.Converter;
-import chat.dim.type.Wrapper;
 
 /**
  *  Command GeneralFactory

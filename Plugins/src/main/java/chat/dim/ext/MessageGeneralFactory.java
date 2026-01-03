@@ -34,14 +34,14 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import chat.dim.data.Converter;
+import chat.dim.data.Wrapper;
 import chat.dim.protocol.Content;
 import chat.dim.protocol.Envelope;
 import chat.dim.protocol.ID;
 import chat.dim.protocol.InstantMessage;
 import chat.dim.protocol.ReliableMessage;
 import chat.dim.protocol.SecureMessage;
-import chat.dim.type.Converter;
-import chat.dim.type.Wrapper;
 
 /**
  *  Message GeneralFactory

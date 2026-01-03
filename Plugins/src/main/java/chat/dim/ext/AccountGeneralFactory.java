@@ -33,6 +33,8 @@ package chat.dim.ext;
 import java.util.HashMap;
 import java.util.Map;
 
+import chat.dim.data.Converter;
+import chat.dim.data.Wrapper;
 import chat.dim.protocol.Address;
 import chat.dim.protocol.Document;
 import chat.dim.protocol.DocumentType;
@@ -41,8 +43,6 @@ import chat.dim.protocol.Meta;
 import chat.dim.protocol.SignKey;
 import chat.dim.protocol.TransportableData;
 import chat.dim.protocol.VerifyKey;
-import chat.dim.type.Converter;
-import chat.dim.type.Wrapper;
 
 /**
  *  Account GeneralFactory

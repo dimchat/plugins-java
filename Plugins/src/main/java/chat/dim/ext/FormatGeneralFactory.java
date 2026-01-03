@@ -31,12 +31,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import chat.dim.data.Converter;
 import chat.dim.format.JSONMap;
 import chat.dim.protocol.DecryptKey;
 import chat.dim.protocol.EncodeAlgorithms;
 import chat.dim.protocol.PortableNetworkFile;
 import chat.dim.protocol.TransportableData;
-import chat.dim.type.Converter;
 import chat.dim.type.Mapper;
 
 /**

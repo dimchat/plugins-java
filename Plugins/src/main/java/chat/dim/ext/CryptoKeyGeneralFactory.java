@@ -28,11 +28,11 @@ package chat.dim.ext;
 import java.util.HashMap;
 import java.util.Map;
 
+import chat.dim.data.Converter;
+import chat.dim.data.Wrapper;
 import chat.dim.protocol.PrivateKey;
 import chat.dim.protocol.PublicKey;
 import chat.dim.protocol.SymmetricKey;
-import chat.dim.type.Converter;
-import chat.dim.type.Wrapper;
 
 /**
  *  CryptographyKey GeneralFactory
