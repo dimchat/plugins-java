@@ -28,6 +28,7 @@ package chat.dim.format;
 import java.net.URI;
 import java.util.Map;
 
+import chat.dim.data.Converter;
 import chat.dim.protocol.DecryptKey;
 import chat.dim.protocol.PortableNetworkFile;
 import chat.dim.protocol.TransportableData;
@@ -38,16 +39,16 @@ import chat.dim.type.Dictionary;
  */
 public final class BaseNetworkFile extends Dictionary implements PortableNetworkFile {
 
-    private final BaseFileWrapper wrapper;
+    private final PortableNetworkFileWrapper wrapper;
 
     public BaseNetworkFile(Map<String, Object> dictionary) {
         super(dictionary);
-        wrapper = new BaseFileWrapper(toMap());
+        wrapper = createWrapper();
     }
 
     public BaseNetworkFile(TransportableData data, String filename, URI url, DecryptKey key) {
         super();
-        wrapper = new BaseFileWrapper(toMap());
+        wrapper = createWrapper();
         // file data
         if (data != null) {
             wrapper.setData(data);
@@ -66,6 +67,18 @@ public final class BaseNetworkFile extends Dictionary implements PortableNetwork
         }
     }
 
+    protected PortableNetworkFileWrapper createWrapper() {
+        PortableNetworkFileWrapper.Factory factory = SharedNetworkFormatAccess.pnfWrapperFactory;
+        return factory.createPortableNetworkFileWrapper(super.toMap());
+    }
+
+    @Override
+    public Map<String, Object> toMap() {
+        // serialize data
+        wrapper.toMap();
+        return super.toMap();
+    }
+
     /**
      *  file data
      */
@@ -78,7 +91,7 @@ public final class BaseNetworkFile extends Dictionary implements PortableNetwork
 
     @Override
     public void setData(byte[] binary) {
-        wrapper.setData(binary);
+        wrapper.setBinary(binary);
     }
 
     /**
@@ -129,39 +142,54 @@ public final class BaseNetworkFile extends Dictionary implements PortableNetwork
 
     @Override
     public String toString() {
-        String urlString = getURLString();
-        if (urlString != null) {
-            // only contains 'URL', return the URL string directly
-            return urlString;
+        // serialize data
+        Map<String, Object> info = toMap();
+        String text = getURLString(info);
+        if (text != null) {
+            // only contains 'URL',
+            // or this info can be built to a data URI
+            return text;
         }
         // not a single URL, encode the entire dictionary
-        return JSONMap.encode(toMap());
+        return JSONMap.encode(info);
     }
 
     @Override
     public Object toObject() {
-        String urlString = getURLString();
-        if (urlString != null) {
-            // only contains 'URL', return the URL string directly
-            return urlString;
+        // serialize data
+        Map<String, Object> info = toMap();
+        String text = getURLString(info);
+        if (text != null) {
+            // only contains 'URL',
+            // or this info can be built to a data URI
+            return text;
         }
         // not a single URL, return the entire dictionary
-        return toMap();
+        return info;
     }
 
-    private String getURLString() {
-        String urlString = getString("URL");
+    private static String getURLString(Map<String, Object> info) {
+        //
+        //  check URL
+        //
+        String urlString = Converter.getString(info.get("URL"));
         if (urlString == null) {
-            return null;
+            //
+            //  check data URI
+            //
+            return DataURI.build(info);
         } else if (urlString.startsWith("data:")) {
             // 'data:...;...,...'
             return urlString;
         }
-        int count = size();
+        //
+        //  check extra params
+        //
+        int count = info.size();
         if (count == 1) {
             // if only contains 'URL' field, return the URL string directly
             return urlString;
-        } else if (count == 2 && containsKey("filename")) {
+        } else if (count == 2 && info.containsKey("filename")) {
             // ignore 'filename' field
             return urlString;
         } else {

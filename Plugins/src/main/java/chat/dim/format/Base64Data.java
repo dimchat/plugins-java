@@ -36,22 +36,34 @@ import chat.dim.type.Dictionary;
  */
 public final class Base64Data extends Dictionary implements TransportableData {
 
-    private final BaseDataWrapper wrapper;
+    private final TransportableDataWrapper wrapper;
 
     public Base64Data(Map<String, Object> dictionary) {
         super(dictionary);
-        wrapper = new BaseDataWrapper(toMap());
+        wrapper = createWrapper();
     }
 
     public Base64Data(byte[] binary) {
         super();
-        wrapper = new BaseDataWrapper(toMap());
+        wrapper = createWrapper();
         // encode algorithm
         wrapper.setAlgorithm(EncodeAlgorithms.BASE_64);
         // binary data
         if (binary != null) {
             wrapper.setData(binary);
         }
+    }
+
+    protected TransportableDataWrapper createWrapper() {
+        TransportableDataWrapper.Factory factory = SharedNetworkFormatAccess.tedWrapperFactory;
+        return factory.createTransportableDataWrapper(super.toMap());
+    }
+
+    @Override
+    public Map<String, Object> toMap() {
+        // serialize data
+        wrapper.encode();
+        return super.toMap();
     }
 
     /**
@@ -85,7 +97,8 @@ public final class Base64Data extends Dictionary implements TransportableData {
     public String toString() {
         // 0. "{BASE64_ENCODE}"
         // 1. "base64,{BASE64_ENCODE}"
-        return wrapper.toString();
+        // 2. "data:image/png;base64,{BASE64_ENCODE}"
+        return wrapper.encode();
     }
 
     /**

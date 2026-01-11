@@ -26,12 +26,11 @@
 package chat.dim.ext;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import chat.dim.data.Converter;
+import chat.dim.format.DataURI;
 import chat.dim.format.JSONMap;
 import chat.dim.protocol.DecryptKey;
 import chat.dim.protocol.EncodeAlgorithms;
@@ -49,81 +48,6 @@ public class FormatGeneralFactory implements GeneralFormatHelper,
     private final Map<String, TransportableData.Factory> tedFactories = new HashMap<>();
 
     private PortableNetworkFile.Factory pnfFactory = null;
-
-    /**
-     *  Split text string to array:
-     *  <blockquote>
-     *      ["{TEXT}", "{algorithm}", "{content-type}"]
-     *  </blockquote>
-     */
-    public static List<String> split(String text) {
-        List<String> array = new ArrayList<>();
-        // "{TEXT}", or
-        // "base64,{BASE64_ENCODE}", or
-        // "data:image/png;base64,{BASE64_ENCODE}"
-        int pos1 = text.indexOf("://");
-        if (pos1 > 0) {
-            // [URL]
-            array.add(text);
-            return array;
-        } else {
-            // skip 'data:'
-            pos1 = text.indexOf(':') + 1;
-        }
-        // seeking for 'content-type'
-        int pos2 = text.indexOf(';', pos1);
-        if (pos2 > pos1) {
-            array.add(text.substring(pos1, pos2));
-            pos1 = pos2 + 1;
-        }
-        // seeking for 'algorithm'
-        pos2 = text.indexOf(',', pos1);
-        if (pos2 > pos1) {
-            array.add(0, text.substring(pos1, pos2));
-            pos1 = pos2 + 1;
-        }
-        if (pos1 == 0) {
-            // [data]
-            array.add(0, text);
-        } else {
-            // [data, algorithm, type]
-            array.add(0, text.substring(pos1));
-        }
-        return array;
-    }
-
-    @SuppressWarnings("unchecked")
-    public static Map<String, Object> decode(Object data, String defaultKey) {
-        if (data instanceof Mapper) {
-            return ((Mapper) data).toMap();
-        } else if (data instanceof Map) {
-            return (Map<String, Object>) data;
-        }
-        String text = data instanceof String ? (String) data : data.toString();
-        if (text.isEmpty()) {
-            return null;
-        } else if (text.startsWith("{") && text.endsWith("}")) {
-            return JSONMap.decode(text);
-        }
-        Map<String, Object> info = new HashMap<>();
-        List<String> array = split(text);
-        int size = array.size();
-        if (size == 1) {
-            info.put(defaultKey, array.get(0));
-        } else {
-            assert size > 1 : "split error: " + text + " => " + array;
-            info.put("data", array.get(0));
-            info.put("algorithm", array.get(1));
-            if (size > 2) {
-                // 'data:...;...,...'
-                info.put("content-type", array.get(2));
-                if (text.startsWith("data:")) {
-                    info.put("URL", text);
-                }
-            }
-        }
-        return info;
-    }
 
     @Override
     public String getFormatAlgorithm(Map<?, ?> ted, String defaultValue) {
@@ -162,7 +86,7 @@ public class FormatGeneralFactory implements GeneralFormatHelper,
             return (TransportableData) ted;
         }
         // unwrap
-        Map<String, Object> info = decode(ted, "data");
+        Map<String, Object> info = parseData(ted);
         if (info == null) {
             //assert false : "TED error: " + ted;
             return null;
@@ -211,7 +135,7 @@ public class FormatGeneralFactory implements GeneralFormatHelper,
             return (PortableNetworkFile) pnf;
         }
         // unwrap
-        Map<String, Object> info = decode(pnf, "URL");
+        Map<String, Object> info = parseURL(pnf);
         if (info == null) {
             //assert false : "PNF error: " + pnf;
             return null;
@@ -219,6 +143,80 @@ public class FormatGeneralFactory implements GeneralFormatHelper,
         PortableNetworkFile.Factory factory = getPortableNetworkFileFactory();
         assert factory != null : "PNF factory not ready";
         return factory.parsePortableNetworkFile(info);
+    }
+
+    //
+    //  Convenience
+    //
+
+    /**
+     *  Parse PNF
+     */
+    protected Map<String, Object> parseURL(Object pnf) {
+        Map<String, Object> info = getMap(pnf);
+        if (info == null) {
+            // parse data URI from text string
+            String text = getString(pnf);
+            info = parseUri(text);
+            if (info != null) {
+                // data URI
+                assert !text.contains("://") : "PNF data error: " + pnf;
+                /*/
+                if (text.startsWith("data:")) {
+                    info.put("URI", text);
+                }
+                /*/
+            } else if (text.contains("://")) {
+                // [URL]
+                info = new HashMap<>();
+                info.put("URL", text);
+            }
+        }
+        return info;
+    }
+
+    /**
+     *  Parse TED
+     */
+    protected Map<String, Object> parseData(Object ted) {
+        Map<String, Object> info = getMap(ted);
+        if (info == null) {
+            // parse data URI from text string
+            String text = getString(ted);
+            info = parseUri(text);
+            if (info == null) {
+                assert !text.contains("://") : "TED data error: " + ted;
+                // [TEXT]
+                info = new HashMap<>();
+                info.put("data", text);
+            }
+        }
+        return info;
+    }
+
+    @SuppressWarnings("unchecked")
+    protected Map<String, Object> getMap(Object data) {
+        if (data instanceof Mapper) {
+            return ((Mapper) data).toMap();
+        } else if (data instanceof Map) {
+            return (Map<String, Object>) data;
+        }
+        String text = getString(data);
+        if (text.length() > 8 && text.startsWith("{") && text.endsWith("}")) {
+            // from JSON string
+            return JSONMap.decode(text);
+        } else {
+            return null;
+        }
+    }
+
+    protected String getString(Object data) {
+        return data instanceof String ? (String) data : data.toString();
+    }
+
+    protected Map<String, Object> parseUri(String text) {
+        DataURI uri = DataURI.parse(text);
+        return uri == null ? null : uri.toMap();
     }
 
 }

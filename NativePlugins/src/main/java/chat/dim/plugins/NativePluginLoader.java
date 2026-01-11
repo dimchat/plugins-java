@@ -32,6 +32,7 @@ import java.security.Security;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import org.bouncycastle.crypto.digests.KeccakDigest;
 import org.bouncycastle.crypto.digests.RIPEMD160Digest;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -101,7 +102,9 @@ public class NativePluginLoader {
                 String s = com.alibaba.fastjson.JSON.toJSONString(container);
                 return s.getBytes(Charset.forName("UTF-8"));
                 */
-                return com.alibaba.fastjson.JSON.toJSONString(container);
+                return com.alibaba.fastjson.JSON.toJSONString(container,
+                        SerializerFeature.DisableCircularReferenceDetect);
+                //return com.alibaba.fastjson.JSON.toJSONString(container);
             }
 
             @Override
