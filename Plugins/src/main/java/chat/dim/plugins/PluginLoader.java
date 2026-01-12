@@ -29,7 +29,6 @@ import java.net.URI;
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
 import java.util.Map;
 
 import chat.dim.crypto.AESKey;
@@ -237,9 +236,7 @@ public class PluginLoader {
 
             @Override
             public SymmetricKey generateSymmetricKey() {
-                Map<String, Object> key = new HashMap<>();
-                key.put("algorithm", SymmetricAlgorithms.AES);
-                return new AESKey(key);
+                return AESKey.newKey();
             }
 
             @Override

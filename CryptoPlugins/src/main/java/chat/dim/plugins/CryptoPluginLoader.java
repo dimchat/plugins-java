@@ -29,7 +29,6 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.security.Provider;
 import java.security.Security;
-import java.util.HashMap;
 import java.util.Map;
 
 import com.alibaba.fastjson.serializer.SerializerFeature;
@@ -166,10 +165,8 @@ public class CryptoPluginLoader {
 
             @Override
             public PrivateKey generatePrivateKey() {
-                Map<String, Object> key = new HashMap<>();
-                key.put("algorithm", AsymmetricAlgorithms.RSA);
                 try {
-                    return new RSAPrivateKey(key);
+                    return RSAPrivateKey.newKey();
                 } catch (NoSuchAlgorithmException e) {
                     e.printStackTrace();
                     return null;
@@ -185,12 +182,7 @@ public class CryptoPluginLoader {
                     assert false : "RSA key error: " + key;
                     return null;
                 }
-                try {
-                    return new RSAPrivateKey(key);
-                } catch (NoSuchAlgorithmException e) {
-                    e.printStackTrace();
-                    return null;
-                }
+                return new RSAPrivateKey(key);
             }
         };
         PrivateKey.setFactory(AsymmetricAlgorithms.RSA, rsaPri);
@@ -208,12 +200,7 @@ public class CryptoPluginLoader {
                     assert false : "RSA key error: " + key;
                     return null;
                 }
-                try {
-                    return new RSAPublicKey(key);
-                } catch (NoSuchFieldException e) {
-                    e.printStackTrace();
-                    return null;
-                }
+                return new RSAPublicKey(key);
             }
         };
         PublicKey.setFactory(AsymmetricAlgorithms.RSA, rsaPub);
@@ -227,10 +214,8 @@ public class CryptoPluginLoader {
 
             @Override
             public PrivateKey generatePrivateKey() {
-                Map<String, Object> key = new HashMap<>();
-                key.put("algorithm", AsymmetricAlgorithms.ECC);
                 try {
-                    return new ECCPrivateKey(key);
+                    return ECCPrivateKey.newKey();
                 } catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException e) {
                     e.printStackTrace();
                     return null;
@@ -246,12 +231,7 @@ public class CryptoPluginLoader {
                     assert false : "ECC key error: " + key;
                     return null;
                 }
-                try {
-                    return new ECCPrivateKey(key);
-                } catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException e) {
-                    e.printStackTrace();
-                    return null;
-                }
+                return new ECCPrivateKey(key);
             }
         };
         PrivateKey.setFactory(AsymmetricAlgorithms.ECC, eccPri);
@@ -268,12 +248,7 @@ public class CryptoPluginLoader {
                     assert false : "ECC key error: " + key;
                     return null;
                 }
-                try {
-                    return new ECCPublicKey(key);
-                } catch (NoSuchFieldException e) {
-                    e.printStackTrace();
-                    return null;
-                }
+                return new ECCPublicKey(key);
             }
         };
         PublicKey.setFactory(AsymmetricAlgorithms.ECC, eccPub);

@@ -37,25 +37,26 @@ import chat.dim.format.PEM;
  *
  *  <blockquote><pre>
  *  keyInfo format: {
- *      algorithm    : "ECC",
- *      curve        : "secp256k1",
- *      data         : "..." // base64_encode()
+ *      "algorithm"    : "ECC",
+ *      "curve"        : "secp256k1",
+ *      "data"         : "..." // base64_encode()
  *  }
  *  </pre></blockquote>
  */
 public final class ECCPublicKey extends BasePublicKey {
 
-    public ECCPublicKey(Map<String, Object> dictionary) throws NoSuchFieldException {
+    public ECCPublicKey(Map<String, Object> dictionary) {
         super(dictionary);
     }
 
     @Override
     public byte[] getData() {
         String pem = getString("data");
-        if (pem == null || pem.length() == 0) {
+        int size = pem == null ? 0 : pem.length();
+        if (size == 0) {
             throw new AssertionError("ECC public key data not found");
         }
-        if (pem.length() == 66 || pem.length() == 130) {
+        if (size == 66 || size == 130) {
             // Hex encode
             return Hex.decode(pem);
         } else {
@@ -92,4 +93,5 @@ public final class ECCPublicKey extends BasePublicKey {
         byte[] hash = SHA256.digest(data);
         return Secp256k1.verify(getPubKey(), hash, signature) != 0;
     }
+
 }

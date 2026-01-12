@@ -40,6 +40,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import chat.dim.ecc.ECCKeys;
+import chat.dim.protocol.AsymmetricAlgorithms;
 import chat.dim.protocol.PublicKey;
 import chat.dim.utils.CryptoUtils;
 
@@ -48,9 +49,9 @@ import chat.dim.utils.CryptoUtils;
  *
  *  <blockquote><pre>
  *  keyInfo format: {
- *      algorithm    : "ECC",
- *      curve        : "secp256k1",
- *      data         : "..." // base64_encode()
+ *      "algorithm"    : "ECC",
+ *      "curve"        : "secp256k1",
+ *      "data"         : "..." // base64_encode()
  *  }
  *  </pre></blockquote>
  */
@@ -59,31 +60,21 @@ public final class ECCPrivateKey extends BasePrivateKey {
     private final ECPrivateKey privateKey;
     private ECPublicKey publicKey;
 
-    public ECCPrivateKey(Map<String, Object> dictionary) throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
+    public ECCPrivateKey(Map<String, Object> dictionary) {
         super(dictionary);
         KeyPair keyPair = getKeyPair();
         privateKey = (ECPrivateKey) keyPair.getPrivate();
         publicKey = (ECPublicKey) keyPair.getPublic();
     }
 
-    private String getCurveName() {
-        return getString("curve", CryptoUtils.SECP256K1);
+    public static ECCPrivateKey newKey() throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
+        return newKey(CryptoUtils.SECP256K1);
     }
+    public static ECCPrivateKey newKey(String curveName) throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
+        Map<String, Object> info = new HashMap<>();
+        info.put("algorithm", AsymmetricAlgorithms.ECC);
 
-    private KeyPair getKeyPair() throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
-        String data = getString("data");
-        if (data == null) {
-            // generate key
-            return generateKeyPair(getCurveName());
-        } else {
-            // parse PEM file content
-            java.security.PublicKey publicKey = ECCKeys.decodePublicKey(data);
-            java.security.PrivateKey privateKey = ECCKeys.decodePrivateKey(data);
-            return new KeyPair(publicKey, privateKey);
-        }
-    }
-
-    private KeyPair generateKeyPair(String curveName) throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
+        // generate key pair
         KeyPairGenerator generator = CryptoUtils.getKeyPairGenerator(CryptoUtils.EC);
         ECGenParameterSpec spec = new ECGenParameterSpec(curveName);
         generator.initialize(spec, new SecureRandom());
@@ -91,12 +82,28 @@ public final class ECCPrivateKey extends BasePrivateKey {
 
         // store private key in PKCS#8 format
         String pem = ECCKeys.encodePrivateKey(keyPair.getPrivate());
-        put("data", pem);
-
+        info.put("data", pem);
         // other parameters
-        put("curve", curveName);
-        put("digest", "SHA256");
-        return keyPair;
+        info.put("curve", curveName);
+        info.put("digest", "SHA256");
+
+        // OK
+        return new ECCPrivateKey(info);
+    }
+
+    private String getCurveName() {
+        return getString("curve", CryptoUtils.SECP256K1);
+    }
+
+    private KeyPair getKeyPair() {
+        String data = getString("data");
+        if (data == null) {
+            throw new NullPointerException("ECC private key data not found");
+        }
+        // parse PEM file content
+        java.security.PublicKey publicKey = ECCKeys.decodePublicKey(data);
+        java.security.PrivateKey privateKey = ECCKeys.decodePrivateKey(data);
+        return new KeyPair(publicKey, privateKey);
     }
 
     @Override
@@ -122,16 +129,11 @@ public final class ECCPrivateKey extends BasePrivateKey {
         String pem = ECCKeys.encodePublicKey(publicKey);
 
         Map<String, Object> keyInfo = new HashMap<>();
-        keyInfo.put("algorithm", get("algorithm"));  // ECC
+        keyInfo.put("algorithm", getAlgorithm());    // AsymmetricAlgorithms.ECC
         keyInfo.put("data", pem);
         keyInfo.put("curve", getCurveName());        // secp256k1
         keyInfo.put("digest", "SHA256");
-        try {
-            return new ECCPublicKey(keyInfo);
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-            return null;
-        }
+        return new ECCPublicKey(keyInfo);
     }
 
     @Override
@@ -146,4 +148,5 @@ public final class ECCPrivateKey extends BasePrivateKey {
             return null;
         }
     }
+
 }

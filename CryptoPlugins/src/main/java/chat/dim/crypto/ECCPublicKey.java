@@ -40,9 +40,9 @@ import chat.dim.utils.CryptoUtils;
  *
  *  <blockquote><pre>
  *  keyInfo format: {
- *      algorithm    : "ECC",
- *      curve        : "secp256k1",
- *      data         : "..." // base64_encode()
+ *      "algorithm"    : "ECC",
+ *      "curve"        : "secp256k1",
+ *      "data"         : "..." // base64_encode()
  *  }
  *  </pre></blockquote>
  */
@@ -50,15 +50,15 @@ public final class ECCPublicKey extends BasePublicKey {
 
     private final ECPublicKey publicKey;
 
-    public ECCPublicKey(Map<String, Object> dictionary) throws NoSuchFieldException {
+    public ECCPublicKey(Map<String, Object> dictionary) {
         super(dictionary);
         publicKey = getKey();
     }
 
-    private ECPublicKey getKey() throws NoSuchFieldException {
+    private ECPublicKey getKey() {
         String data = getString("data");
         if (data == null) {
-            throw new NoSuchFieldException("ECC public key data not found");
+            throw new NullPointerException("ECC public key data not found");
         }
         return (ECPublicKey) ECCKeys.decodePublicKey(data);
     }
@@ -83,4 +83,5 @@ public final class ECCPublicKey extends BasePublicKey {
             return false;
         }
     }
+
 }

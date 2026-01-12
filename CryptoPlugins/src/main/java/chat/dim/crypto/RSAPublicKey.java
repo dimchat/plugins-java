@@ -45,8 +45,8 @@ import chat.dim.utils.CryptoUtils;
  *
  *  <blockquote><pre>
  *  keyInfo format: {
- *      algorithm : "RSA",
- *      data      : "..." // base64_encode()
+ *      "algorithm" : "RSA",
+ *      "data"      : "..." // base64_encode()
  *  }
  *  </pre></blockquote>
  */
@@ -54,7 +54,7 @@ public final class RSAPublicKey extends BasePublicKey implements EncryptKey {
 
     private final java.security.interfaces.RSAPublicKey publicKey;
 
-    public RSAPublicKey(Map<String, Object> dictionary) throws NoSuchFieldException {
+    public RSAPublicKey(Map<String, Object> dictionary) {
         super(dictionary);
         publicKey = getKey();
     }
@@ -68,10 +68,10 @@ public final class RSAPublicKey extends BasePublicKey implements EncryptKey {
         return 1024 / 8; // 128
     }
 
-    private java.security.interfaces.RSAPublicKey getKey() throws NoSuchFieldException {
+    private java.security.interfaces.RSAPublicKey getKey() {
         String data = getString("data");
         if (data == null) {
-            throw new NoSuchFieldException("RSA public key data not found");
+            throw new NullPointerException("RSA public key data not found");
         }
         return (java.security.interfaces.RSAPublicKey) RSAKeys.decodePublicKey(data);
     }
@@ -109,4 +109,5 @@ public final class RSAPublicKey extends BasePublicKey implements EncryptKey {
             return false;
         }
     }
+
 }

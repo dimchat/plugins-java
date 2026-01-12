@@ -51,8 +51,8 @@ import chat.dim.utils.CryptoUtils;
  *
  *  <blockquote><pre>
  *  keyInfo format: {
- *      algorithm : "RSA",
- *      data      : "..." // base64_encode()
+ *      "algorithm" : "RSA",
+ *      "data"      : "..." // base64_encode()
  *  }
  *  </pre></blockquote>
  */
@@ -61,36 +61,21 @@ public final class RSAPrivateKey extends BasePrivateKey implements DecryptKey {
     private final java.security.interfaces.RSAPrivateKey privateKey;
     private final java.security.interfaces.RSAPublicKey publicKey;
 
-    public RSAPrivateKey(Map<String, Object> dictionary) throws NoSuchAlgorithmException {
+    public RSAPrivateKey(Map<String, Object> dictionary) {
         super(dictionary);
         KeyPair keyPair = getKeyPair();
         privateKey = (java.security.interfaces.RSAPrivateKey) keyPair.getPrivate();
         publicKey = (java.security.interfaces.RSAPublicKey) keyPair.getPublic();
     }
 
-    private int keySize() {
-        // TODO: get from key
-        Integer size = getInteger("keySize");
-        if (size != null) {
-            return size;
-        }
-        return 1024 / 8; // 128
+    public static RSAPrivateKey newKey() throws NoSuchAlgorithmException {
+        return newKey(1024);
     }
+    public static RSAPrivateKey newKey(int sizeInBits) throws NoSuchAlgorithmException {
+        Map<String, Object> info = new HashMap<>();
+        info.put("algorithm", AsymmetricAlgorithms.ECC);
 
-    private KeyPair getKeyPair() throws NoSuchAlgorithmException {
-        String data = getString("data");
-        if (data == null) {
-            // generate key
-            return generateKeyPair(keySize() * 8);
-        } else {
-            // parse PEM file content
-            java.security.PublicKey publicKey = RSAKeys.decodePublicKey(data);
-            java.security.PrivateKey privateKey = RSAKeys.decodePrivateKey(data);
-            return new KeyPair(publicKey, privateKey);
-        }
-    }
-
-    private KeyPair generateKeyPair(int sizeInBits) throws NoSuchAlgorithmException {
+        // generate key pair
         KeyPairGenerator generator = KeyPairGenerator.getInstance(AsymmetricAlgorithms.RSA);
         generator.initialize(sizeInBits);
         KeyPair keyPair = generator.generateKeyPair();
@@ -103,14 +88,35 @@ public final class RSAPrivateKey extends BasePrivateKey implements DecryptKey {
         String skString = RSAKeys.encodePrivateKey(keyPair.getPrivate());
         // -----END RSA PRIVATE KEY-----
 
-        put("data", pkString + "\r\n" + skString);
-
+        // store keys
+        info.put("data", pkString + "\r\n" + skString);
         // other parameters
-        put("mode", "ECB");
-        put("padding", "PKCS1");
-        put("digest", "SHA256");
+        info.put("mode", "ECB");
+        info.put("padding", "PKCS1");
+        info.put("digest", "SHA256");
 
-        return keyPair;
+        // OK
+        return new RSAPrivateKey(info);
+    }
+
+    private int keySize() {
+        // TODO: get from key
+        Integer size = getInteger("keySize");
+        if (size != null) {
+            return size;
+        }
+        return 1024 / 8; // 128
+    }
+
+    private KeyPair getKeyPair() {
+        String data = getString("data");
+        if (data == null) {
+            throw new NullPointerException("RSA private key data not found");
+        }
+        // parse PEM file content
+        java.security.PublicKey publicKey = RSAKeys.decodePublicKey(data);
+        java.security.PrivateKey privateKey = RSAKeys.decodePrivateKey(data);
+        return new KeyPair(publicKey, privateKey);
     }
 
     @Override
@@ -125,17 +131,12 @@ public final class RSAPrivateKey extends BasePrivateKey implements DecryptKey {
         }
         String pem = RSAKeys.encodePublicKey(publicKey);
         Map<String, Object> keyInfo = new HashMap<>();
-        keyInfo.put("algorithm", get("algorithm"));  // RSA
+        keyInfo.put("algorithm", getAlgorithm());    // AsymmetricAlgorithms.RSA
         keyInfo.put("data", pem);
         keyInfo.put("mode", "ECB");
         keyInfo.put("padding", "PKCS1");
         keyInfo.put("digest", "SHA256");
-        try {
-            return new RSAPublicKey(keyInfo);
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-            return null;
-        }
+        return new RSAPublicKey(keyInfo);
     }
 
     @Override
@@ -171,4 +172,5 @@ public final class RSAPrivateKey extends BasePrivateKey implements DecryptKey {
     public boolean matchEncryptKey(EncryptKey pKey) {
         return BaseKey.matchEncryptKey(pKey, this);
     }
+
 }

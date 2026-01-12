@@ -34,6 +34,7 @@ import javax.crypto.spec.SecretKeySpec;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
@@ -45,17 +46,15 @@ import chat.dim.protocol.TransportableData;
  *
  *  <blockquote><pre>
  *  keyInfo format: {
- *      algorithm: "AES",
- *      keySize  : 32,                // optional
- *      data     : "{BASE64_ENCODE}}" // password data
+ *      "algorithm": "AES",
+ *      "keySize"  : 32,                // optional
+ *      "data"     : "{BASE64_ENCODE}}" // password data
  *  }
  *  </pre></blockquote>
  */
 public final class AESKey extends BaseSymmetricKey {
 
     public final static String AES_CBC_PKCS7 = "AES/CBC/PKCS7Padding";
-
-    private final int blockSize;  // 16
 
     private TransportableData keyData;
     // private TransportableData ivData;
@@ -65,30 +64,28 @@ public final class AESKey extends BaseSymmetricKey {
         // TODO: check algorithm parameters
         // 1. check mode = 'CBC'
         // 2. check padding = 'PKCS7Padding'
-        blockSize = getDefaultBlockSize();
-        // check key data
-        if (containsKey("data")) {
-            // lazy load
-            keyData = null;
-        } else {
-            // new key
-            keyData = generateKeyData();
-        }
+
+        // lazy load
+        keyData = null;
     }
 
-    protected TransportableData generateKeyData() {
-        // random key data
-        int keySize = getKeySize();
+    public static AESKey newKey() {
+        return newKey(32);
+    }
+    public static AESKey newKey(int keySize) {
         byte[] pwd = randomData(keySize);
         TransportableData ted = TransportableData.create(pwd);
-
-        put("data", ted.toObject());
+        // build key info
+        Map<String, Object> info = new HashMap<>();
+        info.put("algorithm", SymmetricAlgorithms.AES);
+        info.put("data", ted.toObject());
         /*/
-        // put("mode", "CBC");
-        // put("padding", "PKCS7");
+        // info.put("mod", "CBC");
+        // info.put("padding", "PKCS7");
         /*/
-
-        return ted;
+        AESKey key = new AESKey(info);
+        key.keyData = ted;
+        return key;
     }
 
     protected int getDefaultBlockSize() {
@@ -144,7 +141,7 @@ public final class AESKey extends BaseSymmetricKey {
         if (size != null) {
             return size;
         }
-        return blockSize; // 16
+        return getDefaultBlockSize(); // 16
     }
 
     @Override
