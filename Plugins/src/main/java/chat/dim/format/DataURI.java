@@ -61,18 +61,6 @@ public class DataURI {
         return info;
     }
 
-    public static boolean check(String text) {
-        if (text == null || text.isEmpty()) {
-            return false;
-        } else if (text.startsWith("data:")) {
-            // "data:image/png;base64,{BASE64_ENCODE}"
-            return true;
-        }
-        // "base64,{BASE64_ENCODE}"
-        int pos = text.indexOf(',');
-        return 0 < pos && pos < 8;
-    }
-
     /**
      *  Split text string for data URI
      *
@@ -81,38 +69,39 @@ public class DataURI {
      *      2. "data:image/png;base64,{BASE64_ENCODE}"
      */
     public static DataURI parse(String text) {
-        if (!check(text)) {
-            // "{TEXT}", or "{URL}"
+        if (text == null || text.isEmpty()) {
             return null;
         }
-        //
-        //  1. split for head + body
-        //
-        int right = text.indexOf(',');
-        if (right <= 0) {
-            assert false : "data URI error: " + text;
-            return null;
+        int pos;
+        if (text.startsWith("data:")) {
+            // "data:image/png;base64,{BASE64_ENCODE}"
+            text = text.substring(5);
+            pos = text.indexOf(',');
+            if (pos < 0) {
+                assert false : "data URI error: " + text;
+                return null;
+            }
+        } else {
+            // "base64,{BASE64_ENCODE}"
+            pos = text.indexOf(',');
+            if (pos < 0 || pos > 8) {
+                // "{TEXT}", or "{URL}"
+                return null;
+            }
         }
-        String body = text.substring(right + 1);
-        String head = text.substring(0, right);
-        // skip 'data:'
-        int left = head.indexOf(':') + 1;
-        if (left > 0) {
-            head = head.substring(left);
-        }
-        //
-        //  2. split for 'mime-type' + 'algorithm'
-        //
-        right = head.indexOf(';', left);
-        if (right < left) {
+        String body = text.substring(pos + 1);
+        String head = text.substring(0, pos);
+        // split for 'mime-type' + 'encoding'
+        pos = head.indexOf(';');
+        if (pos < 0) {
             // "base64,{BASE64_ENCODE}"
             return new DataURI(null, head, body);
         }
-        assert right > left : "data URI error: " + text;
+        assert pos > 0 : "data URI error: " + text;
         // "data:image/png;base64,{BASE64_ENCODE}"
-        String mime = head.substring(left, right);
-        String algorithm = head.substring(right + 1);
-        return new DataURI(mime, algorithm, body);
+        String mimeType = head.substring(0, pos);
+        String encoding = head.substring(pos + 1);
+        return new DataURI(mimeType, encoding, body);
     }
 
     /**

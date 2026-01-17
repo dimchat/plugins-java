@@ -156,8 +156,8 @@ public class FormatGeneralFactory implements GeneralFormatHelper,
         Map<String, Object> info = getMap(pnf);
         if (info == null) {
             // parse data URI from text string
-            String text = getString(pnf);
-            info = parseUri(text);
+            String text = Converter.getString(pnf);
+            info = parseDataURI(text);
             if (info != null) {
                 // data URI
                 assert !text.contains("://") : "PNF data error: " + pnf;
@@ -182,8 +182,8 @@ public class FormatGeneralFactory implements GeneralFormatHelper,
         Map<String, Object> info = getMap(ted);
         if (info == null) {
             // parse data URI from text string
-            String text = getString(ted);
-            info = parseUri(text);
+            String text = Converter.getString(ted);
+            info = parseDataURI(text);
             if (info == null) {
                 assert !text.contains("://") : "TED data error: " + ted;
                 // [TEXT]
@@ -201,8 +201,10 @@ public class FormatGeneralFactory implements GeneralFormatHelper,
         } else if (data instanceof Map) {
             return (Map<String, Object>) data;
         }
-        String text = getString(data);
-        if (text.length() > 8 && text.startsWith("{") && text.endsWith("}")) {
+        String text = Converter.getString(data);
+        if (text == null || text.length() < 8) {
+            return null;
+        } else if (text.startsWith("{") && text.endsWith("}")) {
             // from JSON string
             return JSONMap.decode(text);
         } else {
@@ -210,11 +212,7 @@ public class FormatGeneralFactory implements GeneralFormatHelper,
         }
     }
 
-    protected String getString(Object data) {
-        return data instanceof String ? (String) data : data.toString();
-    }
-
-    protected Map<String, Object> parseUri(String text) {
+    protected Map<String, Object> parseDataURI(String text) {
         DataURI uri = DataURI.parse(text);
         return uri == null ? null : uri.toMap();
     }
