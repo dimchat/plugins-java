@@ -35,7 +35,12 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
 import chat.dim.protocol.AsymmetricAlgorithms;
+import chat.dim.rfc.CTE;
+import chat.dim.rfc.PKCS1;
+import chat.dim.rfc.PKCS8;
+import chat.dim.rfc.X509;
 import chat.dim.utils.CryptoUtils;
+
 
 public final class PEM {
 
@@ -163,7 +168,7 @@ public final class PEM {
                 begin = "-----BEGIN PUBLIC KEY-----\r\n";
                 end = "\r\n-----END PUBLIC KEY-----";
             }
-            return begin + RFC.rfc2045(data) + end;
+            return begin + CTE.printable(data) + end;
         }
 
         static String getFileContent(java.security.PrivateKey privateKey, String algorithm) throws IOException {
@@ -184,7 +189,7 @@ public final class PEM {
                 begin = "-----BEGIN PRIVATE KEY-----\r\n";
                 end = "\r\n-----END PRIVATE KEY-----";
             }
-            return begin + RFC.rfc2045(data) + end;
+            return begin + CTE.printable(data) + end;
         }
 
         static byte[] getPublicKeyData(String pem, String algorithm) throws NoSuchAlgorithmException, InvalidKeySpecException {

@@ -39,6 +39,7 @@ import chat.dim.digest.SHA256;
 import chat.dim.format.Base58;
 import chat.dim.format.Base64;
 import chat.dim.format.Base64Data;
+import chat.dim.format.BaseData;
 import chat.dim.format.DataCoder;
 import chat.dim.format.EmbedData;
 import chat.dim.format.Hex;
@@ -61,6 +62,7 @@ import chat.dim.protocol.SymmetricAlgorithms;
 import chat.dim.protocol.SymmetricKey;
 import chat.dim.protocol.TransportableData;
 import chat.dim.protocol.TransportableFile;
+import chat.dim.rfc.DataURI;
 
 public class PluginLoader {
 
@@ -172,10 +174,21 @@ public class PluginLoader {
 
             @Override
             public TransportableData parseTransportableData(String ted) {
-                EmbedData data = EmbedData.parse(ted);
-                if (data != null) {
-                    // "data:image/jpeg;base64,..."
-                    return data;
+                DataURI uri = DataURI.parse(ted);
+                if (uri != null) {
+                    String encoding = uri.head.encoding;
+                    if (BaseData.BASE_64.equalsIgnoreCase(encoding)) {
+                        // "data:image/jpeg;base64,..."
+                        return new EmbedData(uri) {
+                            @Override
+                            protected DataCoder getDataCoder() {
+                                return Base64.coder;
+                            }
+                        };
+                    }
+                    // TODO: other encoding?
+                    assert false : "TED encoding error: " + encoding;
+                    return null;
                 }
                 // TODO: check Base-64 format
                 // "{BASE64_ENCODED}"

@@ -23,93 +23,31 @@
  * SOFTWARE.
  * ==============================================================================
  */
-package chat.dim.format;
+package chat.dim.rfc;
 
-import java.io.IOException;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPrivateCrtKeySpec;
 import java.security.spec.RSAPublicKeySpec;
 
-import org.bouncycastle.asn1.ASN1Primitive;
-import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-
 import chat.dim.protocol.AsymmetricAlgorithms;
 
-final class RFC {
-
-    static String rfc2045(byte[] data) {
-        String base64 = Base64.encode(data);
-        int length = base64.length();
-        final int MIME_LINE_MAX_LEN = 76;
-        final String CR_LF = "\r\n";
-        if (length > MIME_LINE_MAX_LEN && !base64.contains(CR_LF)) {
-            StringBuilder sb = new StringBuilder();
-            for (int beginIndex = 0, endIndex; beginIndex < length; beginIndex += MIME_LINE_MAX_LEN) {
-                endIndex = beginIndex + MIME_LINE_MAX_LEN;
-                if (endIndex < length) {
-                    sb.append(base64, beginIndex, endIndex);
-                    sb.append(CR_LF);
-                } else {
-                    sb.append(base64, beginIndex, length);
-                    break;
-                }
-            }
-            base64 = sb.toString();
-        }
-        return base64;
-    }
-}
-
-/*
- *  X.509 -- https://tools.ietf.org/html/rfc5280
- */
-final class X509 {
-    private final byte[] data;
-
-    /*
-    static byte[] header = { 48, -127, -97, 48, 13, 6, 9, 42, -122, 72, -122, -9, 13, 1, 1, 1, 5, 0, 3, -127, -115, 0 };
-    */
-
-    X509(byte[] data) {
-        this.data = data;
-    }
-
-    // convert X.509 to PKCS#1
-    byte[] toPKCS1() throws IOException {
-        /*
-        int from = header.length;
-        int to = data.length;
-        int length = to - from;
-        if (length <= 0) {
-            throw new ArrayIndexOutOfBoundsException("public key data not in X.509 format");
-        }
-        byte[] pkcs1 = new byte[length];
-        System.arraycopy(data, from, pkcs1, 0, length);
-        return pkcs1;
-        */
-        SubjectPublicKeyInfo keyInfo = SubjectPublicKeyInfo.getInstance(data);
-        ASN1Primitive primitive = keyInfo.parsePublicKey();
-        return primitive.getEncoded();
-    }
-}
 
 /*
  *  PKCS#1 -- https://tools.ietf.org/html/rfc3447
  */
-final class PKCS1 {
+public final class PKCS1 {
     private final byte[] data;
     private final boolean isPrivate;
 
-    PKCS1(byte[] data, boolean isPrivate) {
+    public PKCS1(byte[] data, boolean isPrivate) {
         this.data = data;
         this.isPrivate = isPrivate;
     }
 
     // TODO: convert PKCS#1 to X.509
-    byte[] toX509() throws NoSuchAlgorithmException, InvalidKeySpecException {
+    public byte[] toX509() throws NoSuchAlgorithmException, InvalidKeySpecException {
         /*
         byte[] header = X509.header;
         byte[] out = new byte[header.length + data.length];
@@ -132,7 +70,7 @@ final class PKCS1 {
     }
 
     // convert PKCS#1 to PKCS#8
-    byte[] toPKCS8() throws NoSuchAlgorithmException, InvalidKeySpecException {
+    public byte[] toPKCS8() throws NoSuchAlgorithmException, InvalidKeySpecException {
         if (!isPrivate) {
             throw new InvalidKeySpecException("it's not private key data");
         }
@@ -144,22 +82,5 @@ final class PKCS1 {
                 privateKey.getExponent1(), privateKey.getExponent2(), privateKey.getCoefficient());
         return keyFactory.generatePrivate(keySpec).getEncoded();
     }
-}
 
-/*
- *  PKCS#8 -- https://tools.ietf.org/html/rfc5208
- */
-final class PKCS8 {
-    private final byte[] data;
-
-    PKCS8(byte[] data) {
-        this.data = data;
-    }
-
-    // convert PKCS#8 to PKCS#1
-    byte[] toPKCS1() throws IOException {
-        PrivateKeyInfo keyInfo = PrivateKeyInfo.getInstance(data);
-        ASN1Primitive primitive = keyInfo.parsePrivateKey().toASN1Primitive();
-        return primitive.getEncoded();
-    }
 }
