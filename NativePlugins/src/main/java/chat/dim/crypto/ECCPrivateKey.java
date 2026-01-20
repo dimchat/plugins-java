@@ -32,8 +32,10 @@ import chat.dim.digest.SHA256;
 import chat.dim.ecc.Secp256k1;
 import chat.dim.format.Hex;
 import chat.dim.format.PEM;
+import chat.dim.format.PlainData;
 import chat.dim.protocol.AsymmetricAlgorithms;
 import chat.dim.protocol.PublicKey;
+import chat.dim.protocol.TransportableData;
 import chat.dim.utils.CryptoUtils;
 
 /**
@@ -102,48 +104,49 @@ public final class ECCPrivateKey extends BasePrivateKey {
     }
 
     @Override
-    public byte[] getData() {
+    public TransportableData getData() {
         if (privateKeyData == null) {
             String pem = getString("data");
-            if (pem != null) {
-                if (pem.length() == 64) {
-                    // decode from Hex string
-                    privateKeyData = Hex.decode(pem);
-                } else {
-                    // parse PEM file content
-                    byte[] data = PEM.decodePublicKeyData(pem, "ECC");
-                    if (data != null && data.length > 65) {
-                        // FIXME: X.509 -> Uncompressed Point
-                        assert data.length == 88 : "unexpected ECC public key: " + pem;
-                        if (data[88-65] == 0x04) {
-                            byte[] buffer = new byte[65];
-                            System.arraycopy(data, 88-65, buffer, 0, 65);
-                            data = buffer;
-                        } else {
-                            throw new AssertionError("ECCKeyError: " + pem);
-                        }
+            if (pem == null) {
+                throw new AssertionError("ECC private key data not found");
+            }
+            if (pem.length() == 64) {
+                // decode from Hex string
+                privateKeyData = Hex.decode(pem);
+            } else {
+                // parse PEM file content
+                byte[] data = PEM.decodePublicKeyData(pem, "ECC");
+                if (data != null && data.length > 65) {
+                    // FIXME: X.509 -> Uncompressed Point
+                    assert data.length == 88 : "unexpected ECC public key: " + pem;
+                    if (data[88-65] == 0x04) {
+                        byte[] buffer = new byte[65];
+                        System.arraycopy(data, 88-65, buffer, 0, 65);
+                        data = buffer;
+                    } else {
+                        throw new AssertionError("ECCKeyError: " + pem);
                     }
-                    publicKeyData = data;
+                }
+                publicKeyData = data;
 
-                    data = PEM.decodePrivateKeyData(pem, "ECC");
-                    if (data != null) {
-                        // PKCS#8
-                        assert data.length == 135;
-                        privateKeyData = new byte[32];
-                        System.arraycopy(data, 33, privateKeyData, 0, 32);
-                    }
+                data = PEM.decodePrivateKeyData(pem, "ECC");
+                if (data != null) {
+                    // PKCS#8
+                    assert data.length == 135;
+                    privateKeyData = new byte[32];
+                    System.arraycopy(data, 33, privateKeyData, 0, 32);
                 }
             }
         }
-        return privateKeyData;
+        return PlainData.create(privateKeyData);
     }
 
     @Override
     public PublicKey getPublicKey() {
         if (publicKeyData == null) {
-            byte[] priKey = getData();
+            byte[] priKey = getData().getBytes();
             if (priKey == null) {
-                throw new NullPointerException("private key not found");
+                throw new NullPointerException("ECC private key not found");
             }
             byte[] pubKey = Secp256k1.computePublicKey(priKey);
             copyPublicKeyData(pubKey);

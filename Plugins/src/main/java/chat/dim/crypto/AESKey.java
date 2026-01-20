@@ -38,6 +38,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
+import chat.dim.format.Base64Data;
 import chat.dim.protocol.SymmetricAlgorithms;
 import chat.dim.protocol.TransportableData;
 
@@ -74,11 +75,11 @@ public final class AESKey extends BaseSymmetricKey {
     }
     public static AESKey newKey(int keySize) {
         byte[] pwd = randomData(keySize);
-        TransportableData ted = TransportableData.create(pwd);
+        TransportableData ted = Base64Data.create(pwd);
         // build key info
         Map<String, Object> info = new HashMap<>();
         info.put("algorithm", SymmetricAlgorithms.AES);
-        info.put("data", ted.toObject());
+        info.put("data", ted.serialize());
         /*/
         // info.put("mod", "CBC");
         // info.put("padding", "PKCS7");
@@ -145,15 +146,16 @@ public final class AESKey extends BaseSymmetricKey {
     }
 
     @Override
-    public byte[] getData() {
+    public TransportableData getData() {
         TransportableData ted = keyData;
         if (ted == null) {
             Object base64 = get("data");
             assert base64 != null : "key data not found: " + toMap();
-            keyData = ted = TransportableData.parse(base64);
-            //assert keyData != null : "key data error: " + base64;
+            ted = TransportableData.parse(base64);
+            assert ted != null && !ted.isEmpty() : "key data error: " + base64;
+            keyData = ted;
         }
-        return ted == null ? null : ted.getData();
+        return ted;
     }
 
     protected byte[] getInitVector(Map<String, Object> params) {
@@ -176,13 +178,12 @@ public final class AESKey extends BaseSymmetricKey {
             }
         }
         // decode IV data
-        TransportableData ted = TransportableData.parse(base64);
-        byte[] iv = ted == null ? null : ted.getData();
-        if (iv == null || iv.length == 0) {
+        TransportableData iv = TransportableData.parse(base64);
+        if (iv == null || iv.isEmpty()) {
             assert base64 == null : "IV data error: " + base64;
             return null;
         }
-        return iv;
+        return iv.getBytes();
     }
     protected byte[] zeroInitVector() {
         // zero IV
@@ -197,8 +198,8 @@ public final class AESKey extends BaseSymmetricKey {
         if (extra == null) {
             assert false : "extra dict must provided to store IV for AES";
         } else {
-            TransportableData ted = TransportableData.create(iv);
-            extra.put("IV", ted.toObject());
+            TransportableData ted = Base64Data.create(iv);
+            extra.put("IV", ted.serialize());
         }
         // OK
         return iv;
@@ -212,10 +213,10 @@ public final class AESKey extends BaseSymmetricKey {
             iv = newInitVector(extra);
         }
         // 2. get key data
-        byte[] data = getData();
-        assert data != null : "key error: " + toMap();
+        TransportableData data = getData();
+        assert data != null && !data.isEmpty() : "key error: " + toMap();
         // 3. try to encrypt
-        Cipher cipher = getEncryptCipher(data, iv);
+        Cipher cipher = getEncryptCipher(data.getBytes(), iv);
         if (cipher == null) {
             assert false : "failed to get encrypt cipher";
             return null;
@@ -236,10 +237,10 @@ public final class AESKey extends BaseSymmetricKey {
             iv = zeroInitVector();
         }
         // 2. get key data
-        byte[] data = getData();
-        assert data != null : "key error: " + toMap();
+        TransportableData data = getData();
+        assert data != null && !data.isEmpty() : "key error: " + toMap();
         // 3. try to decrypt
-        Cipher cipher = getDecryptCipher(data, iv);
+        Cipher cipher = getDecryptCipher(data.getBytes(), iv);
         if (cipher == null) {
             assert false : "failed to get decrypt cipher";
             return null;

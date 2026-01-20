@@ -28,8 +28,10 @@ package chat.dim.crypto;
 import java.util.HashMap;
 import java.util.Map;
 
+import chat.dim.format.PlainData;
 import chat.dim.protocol.SymmetricAlgorithms;
 import chat.dim.protocol.SymmetricKey;
+import chat.dim.protocol.TransportableData;
 
 /**
  *  Symmetric key for broadcast message,
@@ -42,8 +44,8 @@ public final class PlainKey extends BaseSymmetricKey {
     }
 
     @Override
-    public byte[] getData() {
-        return new byte[0];
+    public TransportableData getData() {
+        return PlainData.ZERO;
     }
 
     @Override

@@ -81,9 +81,10 @@ public final class ETHMeta extends BaseMeta {
         if (cached == null/* || cached.getType() != type*/) {
             // 64 bytes key data without prefix 0x04
             VerifyKey key = getPublicKey();
-            byte[] data = key.getData();
+            TransportableData data = key.getData();
+            assert data != null && !data.isEmpty() : "meta.key error: " + key;
             // generate and cache it
-            cached = ETHAddress.generate(data);
+            cached = ETHAddress.generate(data.getBytes());
             cachedAddress = cached;
         }
         return cached;

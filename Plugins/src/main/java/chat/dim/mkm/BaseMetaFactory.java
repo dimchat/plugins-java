@@ -33,6 +33,7 @@ package chat.dim.mkm;
 import java.util.Map;
 
 import chat.dim.ext.SharedAccountExtensions;
+import chat.dim.format.Base64Data;
 import chat.dim.format.UTF8;
 import chat.dim.protocol.Meta;
 import chat.dim.protocol.MetaType;
@@ -61,7 +62,7 @@ public class BaseMetaFactory implements Meta.Factory {
         } else {
             byte[] data = UTF8.encode(seed);
             byte[] sig = sKey.sign(data);
-            fingerprint = TransportableData.create(sig);
+            fingerprint = Base64Data.create(sig);
         }
         VerifyKey key = ((PrivateKey) sKey).getPublicKey();
         return createMeta(key, seed, fingerprint);

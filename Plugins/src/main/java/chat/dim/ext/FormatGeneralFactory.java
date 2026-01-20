@@ -29,53 +29,37 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
-import chat.dim.data.Converter;
-import chat.dim.format.DataURI;
+import chat.dim.data.Wrapper;
 import chat.dim.format.JSONMap;
 import chat.dim.protocol.DecryptKey;
-import chat.dim.protocol.EncodeAlgorithms;
-import chat.dim.protocol.PortableNetworkFile;
 import chat.dim.protocol.TransportableData;
+import chat.dim.protocol.TransportableFile;
+import chat.dim.rfc.DataURI;
 import chat.dim.type.Mapper;
+
 
 /**
  *  Format GeneralFactory
  */
-public class FormatGeneralFactory implements GeneralFormatHelper,
-                                             PortableNetworkFileHelper,
+public class FormatGeneralFactory implements TransportableFileHelper,
                                              TransportableDataHelper {
 
-    private final Map<String, TransportableData.Factory> tedFactories = new HashMap<>();
+    private TransportableData.Factory tedFactory = null;
 
-    private PortableNetworkFile.Factory pnfFactory = null;
-
-    @Override
-    public String getFormatAlgorithm(Map<?, ?> ted, String defaultValue) {
-        return Converter.getString(ted.get("algorithm"), defaultValue);
-    }
+    private TransportableFile.Factory pnfFactory = null;
 
     ///
     ///   TED - Transportable Encoded Data
     ///
 
     @Override
-    public void setTransportableDataFactory(String algorithm, TransportableData.Factory factory) {
-        tedFactories.put(algorithm, factory);
+    public void setTransportableDataFactory(TransportableData.Factory factory) {
+        tedFactory = factory;
     }
 
     @Override
-    public TransportableData.Factory getTransportableDataFactory(String algorithm) {
-        return tedFactories.get(algorithm);
-    }
-
-    @Override
-    public TransportableData createTransportableData(byte[] data, String algorithm) {
-        if (algorithm == null) {
-            algorithm = EncodeAlgorithms.DEFAULT;
-        }
-        TransportableData.Factory factory = getTransportableDataFactory(algorithm);
-        assert factory != null : "TED algorithm not support: " + algorithm;
-        return factory.createTransportableData(data);
+    public TransportableData.Factory getTransportableDataFactory() {
+        return tedFactory;
     }
 
     @Override
@@ -86,23 +70,14 @@ public class FormatGeneralFactory implements GeneralFormatHelper,
             return (TransportableData) ted;
         }
         // unwrap
-        Map<String, Object> info = parseData(ted);
-        if (info == null) {
-            //assert false : "TED error: " + ted;
+        String str = Wrapper.getString(ted);
+        if (str == null) {
+            assert false : "TED error: " + ted;
             return null;
         }
-        String algo = getFormatAlgorithm(info, null);
-        // assert algo != null : "TED error: " + ted;
-        TransportableData.Factory factory = algo == null ? null : getTransportableDataFactory(algo);
-        if (factory == null) {
-            // unknown algorithm, get default factory
-            factory = getTransportableDataFactory("*");  // unknown
-            if (factory == null) {
-                assert false : "default TED factory not found: " + ted;
-                return null;
-            }
-        }
-        return factory.parseTransportableData(info);
+        TransportableData.Factory factory = getTransportableDataFactory();
+        assert factory != null : "TED factory not ready";
+        return factory.parseTransportableData(str);
     }
 
     ///
@@ -110,111 +85,79 @@ public class FormatGeneralFactory implements GeneralFormatHelper,
     ///
 
     @Override
-    public void setPortableNetworkFileFactory(PortableNetworkFile.Factory factory) {
+    public void setTransportableFileFactory(TransportableFile.Factory factory) {
         pnfFactory = factory;
     }
 
     @Override
-    public PortableNetworkFile.Factory getPortableNetworkFileFactory() {
+    public TransportableFile.Factory getTransportableFileFactory() {
         return pnfFactory;
     }
 
     @Override
-    public PortableNetworkFile createPortableNetworkFile(TransportableData data, String filename,
-                                                         URI url, DecryptKey password) {
-        PortableNetworkFile.Factory factory = getPortableNetworkFileFactory();
+    public TransportableFile createTransportableFile(TransportableData data, String filename,
+                                                     URI url, DecryptKey password) {
+        TransportableFile.Factory factory = getTransportableFileFactory();
         assert factory != null : "PNF factory not ready";
-        return factory.createPortableNetworkFile(data, filename, url, password);
+        return factory.createTransportableFile(data, filename, url, password);
     }
 
     @Override
-    public PortableNetworkFile parsePortableNetworkFile(Object pnf) {
+    public TransportableFile parseTransportableFile(Object pnf) {
         if (pnf == null) {
             return null;
-        } else if (pnf instanceof PortableNetworkFile) {
-            return (PortableNetworkFile) pnf;
+        } else if (pnf instanceof TransportableFile) {
+            return (TransportableFile) pnf;
         }
         // unwrap
-        Map<String, Object> info = parseURL(pnf);
+        Map<String, Object> info = getTransportableFileContent(pnf);
         if (info == null) {
-            //assert false : "PNF error: " + pnf;
+            assert false : "PNF error: " + pnf;
             return null;
         }
-        PortableNetworkFile.Factory factory = getPortableNetworkFileFactory();
+        TransportableFile.Factory factory = getTransportableFileFactory();
         assert factory != null : "PNF factory not ready";
-        return factory.parsePortableNetworkFile(info);
-    }
-
-    //
-    //  Convenience
-    //
-
-    /**
-     *  Parse PNF
-     */
-    protected Map<String, Object> parseURL(Object pnf) {
-        Map<String, Object> info = getMap(pnf);
-        if (info == null) {
-            // parse data URI from text string
-            String text = Converter.getString(pnf);
-            info = parseDataURI(text);
-            if (info != null) {
-                // data URI
-                assert !text.contains("://") : "PNF data error: " + pnf;
-                /*/
-                if (text.startsWith("data:")) {
-                    info.put("URI", text);
-                }
-                /*/
-            } else if (text.contains("://")) {
-                // [URL]
-                info = new HashMap<>();
-                info.put("URL", text);
-            }
-        }
-        return info;
-    }
-
-    /**
-     *  Parse TED
-     */
-    protected Map<String, Object> parseData(Object ted) {
-        Map<String, Object> info = getMap(ted);
-        if (info == null) {
-            // parse data URI from text string
-            String text = Converter.getString(ted);
-            info = parseDataURI(text);
-            if (info == null) {
-                assert !text.contains("://") : "TED data error: " + ted;
-                // [TEXT]
-                info = new HashMap<>();
-                info.put("data", text);
-            }
-        }
-        return info;
+        return factory.parseTransportableFile(info);
     }
 
     @SuppressWarnings("unchecked")
-    protected Map<String, Object> getMap(Object data) {
-        if (data instanceof Mapper) {
-            return ((Mapper) data).toMap();
-        } else if (data instanceof Map) {
-            return (Map<String, Object>) data;
+    protected Map<String, Object> getTransportableFileContent(Object pnf) {
+        if (pnf instanceof Mapper) {
+            return ((Mapper) pnf).toMap();
+        } else if (pnf instanceof Map) {
+            return (Map<String, Object>) pnf;
         }
-        String text = Converter.getString(data);
+        String text = Wrapper.getString(pnf);
         if (text == null || text.length() < 8) {
+            assert false : "PNF error: " + pnf;
             return null;
-        } else if (text.startsWith("{") && text.endsWith("}")) {
-            // from JSON string
+        } else if (text.startsWith("{")) {
+            // decode JSON string
+            assert text.endsWith("}") : "PNF json error: " + pnf;
             return JSONMap.decode(text);
-        } else {
-            return null;
         }
-    }
+        Map<String, Object> content = new HashMap<>();
 
-    protected Map<String, Object> parseDataURI(String text) {
+        // 1. check for URL: "http://..."
+        int pos = text.indexOf("://");
+        if (0 < pos && pos < 8) {
+            content.put("URL", text);
+            return content;
+        }
+
+        content.put("data", text);
+        // 2. check for data URI: "data:image/jpeg;base64,..."
         DataURI uri = DataURI.parse(text);
-        return uri == null ? null : uri.toMap();
+        if (uri != null) {
+            String filename = uri.getFilename();
+            if (filename != null) {
+                content.put("filename", filename);
+            }
+        //} else {
+        //    // 3. check for Base-64 encoded string?
+        }
+
+        return content;
     }
 
 }

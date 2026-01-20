@@ -82,9 +82,10 @@ public final class BTCMeta extends BaseMeta {
         if (cached == null) {
             // TODO: compress public key?
             VerifyKey key = getPublicKey();
-            byte[] data = key.getData();
+            TransportableData data = key.getData();
+            assert data != null && !data.isEmpty() : "meta.key error: " + key;
             // generate and cache it
-            cached = BTCAddress.generate(data, network);
+            cached = BTCAddress.generate(data.getBytes(), network);
             cachedAddresses.put(network, cached);
         }
         return cached;

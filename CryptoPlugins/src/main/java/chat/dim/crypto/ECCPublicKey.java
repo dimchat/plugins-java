@@ -33,6 +33,8 @@ import java.security.interfaces.ECPublicKey;
 import java.util.Map;
 
 import chat.dim.ecc.ECCKeys;
+import chat.dim.format.PlainData;
+import chat.dim.protocol.TransportableData;
 import chat.dim.utils.CryptoUtils;
 
 /**
@@ -64,11 +66,12 @@ public final class ECCPublicKey extends BasePublicKey {
     }
 
     @Override
-    public byte[] getData() {
+    public TransportableData getData() {
         if (publicKey == null) {
-            return null;
+            throw new NullPointerException("ECC public key not found");
         }
-        return ECCKeys.getPointData(publicKey);
+        byte[] data = ECCKeys.getPointData(publicKey);
+        return PlainData.create(data);
     }
 
     @Override

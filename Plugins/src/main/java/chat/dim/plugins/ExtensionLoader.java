@@ -122,7 +122,6 @@ public class ExtensionLoader {
         FormatGeneralFactory formatHelper = new FormatGeneralFactory();
         SharedFormatExtensions.pnfHelper = formatHelper;
         SharedFormatExtensions.tedHelper = formatHelper;
-        SharedFormatExtensions.helper    = formatHelper;
     }
     protected void registerAccountHelpers() {
         // mkm

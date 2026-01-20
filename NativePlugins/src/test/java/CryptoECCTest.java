@@ -57,10 +57,10 @@ public class CryptoECCTest {
 
     private void testKeys(PrivateKey sKey, PublicKey pKey) {
         Log.info("ECC private key: " + sKey);
-        Log.info("secret data: " + Hex.encode(sKey.getData()));
+        Log.info("secret data: " + Hex.encode(sKey.getData().getBytes()));
 
         Log.info("ECC public key: " + pKey);
-        Log.info("pub data: " + Hex.encode(pKey.getData()));
+        Log.info("pub data: " + Hex.encode(pKey.getData().getBytes()));
 
         // sign
         byte[] data = "moky".getBytes();
@@ -91,7 +91,7 @@ public class CryptoECCTest {
     }
 
     private void testAddress(PublicKey pKey) {
-        byte[] pub = pKey.getData();
+        byte[] pub = pKey.getData().getBytes();
         Log.info("pub: " + Hex.encode(pub));
 
         BTCAddress btc = BTCAddress.generate(pub, (byte) 0);
@@ -106,7 +106,7 @@ public class CryptoECCTest {
         PublicKey key = getPublicKey();
         Log.info("ECC public key: " + key);
 
-        byte[] data = key.getData();
+        byte[] data = key.getData().getBytes();
         String hex = Hex.encode(data);
         Log.info("pub: " + hex);
         String expected = "04f365dd8abe7c3671ffbd2b9d68e43682c1ecd7d9fb71f7d250c87388d9d48d63b88c79820da334d4847f8a1bde9e9d05fdaca7d6ffb353d2be7b9db8ed86c35a";
@@ -123,7 +123,7 @@ public class CryptoECCTest {
         PrivateKey sKey = getPrivateKey();
         Log.info("ECC private key: " + sKey);
 
-        byte[] data = sKey.getData();
+        byte[] data = sKey.getData().getBytes();
         String hex = Hex.encode(data);
         Log.info("priv: " + hex);
         String expected = "39498636ab19f03bca97b78f1d4dbc06970f4a1715d2c4a03a34d8dae9a132a9";
@@ -157,15 +157,15 @@ public class CryptoECCTest {
 //                "wNmHzTJt7u6ZcRKTZzg++PKl8oR8qAnOeMbpapAbPxphUeTEtOsQ\n" +
 //                "-----END PRIVATE KEY-----");
 
-        byte[] pri = sk.getData();
+        byte[] pri = sk.getData().getBytes();
         Log.info("pri data: " + Hex.encode(pri));
 
         pk = sk.getPublicKey();
-        byte[] pub = pk.getData();
+        byte[] pub = pk.getData().getBytes();
         Log.info("pub data: " + Hex.encode(pub));
         
         pk = getPublicKey("-----BEGIN PUBLIC KEY-----\nMFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEnPfF4seF4dE1qi3a70D2c+vwijAOTU+L\n7cDZh80ybe7umXESk2c4PvjypfKEfKgJznjG6WqQGz8aYVHkxLTrEA==\n-----END PUBLIC KEY-----");
-        pub = pk.getData();
+        pub = pk.getData().getBytes();
         Log.info("pub2data: " + Hex.encode(pub));
     }
 
@@ -182,7 +182,7 @@ public class CryptoECCTest {
 
         PublicKey pKey = sKey.getPublicKey();
         Log.info("ECC public key: " + pKey);
-        Log.info("pub data: " + Hex.encode(pKey.getData()));
+        Log.info("pub data: " + Hex.encode(pKey.getData().getBytes()));
 
         boolean ok = pKey.verify(data, signature);
         Assert.assertTrue(ok);
@@ -200,7 +200,7 @@ public class CryptoECCTest {
                 "047c91259636a5a16538e0603636f06c532dd6f2bb42f8dd33fa0cdb39546cf449612f3eaf15db9443b7e0668ef22187de9059633eb23112643a38771c630db911");
         PublicKey pKey = sKey.getPublicKey();
 
-        byte[] pub = pKey.getData();
+        byte[] pub = pKey.getData().getBytes();
         Log.info("pub: " + Hex.encode(pub));
 
         pub = Hex.decode("04d061e9c5891f579fd548cfd22ff29f5c642714cc7e7a9215f0071ef5a5723f691757b28e31be71f09f24673eed52348e58d53bcfd26f4d96ec6bf1489eab429d");
@@ -251,7 +251,7 @@ public class CryptoECCTest {
         // 16UwLL9Risc3QfPqBUvKofHmBQ7wMtjvM
         // 0x3E9003153d9A39D3f57B126b0c38513D5e289c3E
         pKey = sKey.getPublicKey();
-        byte[] pub = pKey.getData();
+        byte[] pub = pKey.getData().getBytes();
         byte[] sig = sKey.sign(pub);
         String hex = Hex.encode(sig);
         boolean ok = pKey.verify(pub, sig);

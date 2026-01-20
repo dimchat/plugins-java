@@ -77,9 +77,9 @@ public final class DefaultMeta extends BaseMeta {
         Address cached = cachedAddresses.get(network);
         if (cached == null) {
             // generate and cache it
-            byte[] data = getFingerprint();
-            assert data != null && data.length > 0 : "meta.fingerprint empty";
-            cached = BTCAddress.generate(data, network);
+            TransportableData data = getFingerprint();
+            assert data != null && !data.isEmpty() : "meta.fingerprint empty";
+            cached = BTCAddress.generate(data.getBytes(), network);
             cachedAddresses.put(network, cached);
         }
         return cached;

@@ -40,8 +40,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import chat.dim.ecc.ECCKeys;
+import chat.dim.format.PlainData;
 import chat.dim.protocol.AsymmetricAlgorithms;
 import chat.dim.protocol.PublicKey;
+import chat.dim.protocol.TransportableData;
 import chat.dim.utils.CryptoUtils;
 
 /**
@@ -107,11 +109,12 @@ public final class ECCPrivateKey extends BasePrivateKey {
     }
 
     @Override
-    public byte[] getData() {
+    public TransportableData getData() {
         if (privateKey == null) {
-            return null;
+            throw new NullPointerException("ECC private key not found");
         }
-        return ECCKeys.getPointData(privateKey);
+        byte[] data = ECCKeys.getPointData(privateKey);
+        return PlainData.create(data);
     }
 
     @Override

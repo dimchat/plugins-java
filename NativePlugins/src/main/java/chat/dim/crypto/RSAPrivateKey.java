@@ -39,11 +39,13 @@ import java.security.SignatureException;
 import java.util.HashMap;
 import java.util.Map;
 
+import chat.dim.format.PlainData;
 import chat.dim.format.RSAKeys;
 import chat.dim.protocol.AsymmetricAlgorithms;
 import chat.dim.protocol.DecryptKey;
 import chat.dim.protocol.EncryptKey;
 import chat.dim.protocol.PublicKey;
+import chat.dim.protocol.TransportableData;
 import chat.dim.utils.CryptoUtils;
 
 /**
@@ -120,8 +122,12 @@ public final class RSAPrivateKey extends BasePrivateKey implements DecryptKey {
     }
 
     @Override
-    public byte[] getData() {
-        return privateKey == null ? null : privateKey.getEncoded();
+    public TransportableData getData() {
+        if (privateKey == null) {
+            throw new NullPointerException("RSA private key not found");
+        }
+        byte[] data = privateKey.getEncoded();
+        return PlainData.create(data);
     }
 
     @Override

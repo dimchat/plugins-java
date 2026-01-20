@@ -39,10 +39,11 @@ import chat.dim.digest.SHA256;
 import chat.dim.format.Base58;
 import chat.dim.format.Base64;
 import chat.dim.format.Base64Data;
-import chat.dim.format.BaseNetworkFile;
 import chat.dim.format.DataCoder;
+import chat.dim.format.EmbedData;
 import chat.dim.format.Hex;
 import chat.dim.format.HexCoder;
+import chat.dim.format.PortableNetworkFile;
 import chat.dim.format.StringCoder;
 import chat.dim.format.UTF8;
 import chat.dim.mkm.BaseAddressFactory;
@@ -53,14 +54,13 @@ import chat.dim.protocol.Address;
 import chat.dim.protocol.DecryptKey;
 import chat.dim.protocol.Document;
 import chat.dim.protocol.DocumentType;
-import chat.dim.protocol.EncodeAlgorithms;
 import chat.dim.protocol.ID;
 import chat.dim.protocol.Meta;
 import chat.dim.protocol.MetaType;
-import chat.dim.protocol.PortableNetworkFile;
 import chat.dim.protocol.SymmetricAlgorithms;
 import chat.dim.protocol.SymmetricKey;
 import chat.dim.protocol.TransportableData;
+import chat.dim.protocol.TransportableFile;
 
 public class PluginLoader {
 
@@ -146,51 +146,42 @@ public class PluginLoader {
     }
     protected void registerPNFFactory() {
         // PNF
-        PortableNetworkFile.setFactory(new PortableNetworkFile.Factory() {
+        TransportableFile.setFactory(new TransportableFile.Factory() {
 
             @Override
-            public PortableNetworkFile createPortableNetworkFile(TransportableData data, String filename,
-                                                                 URI url, DecryptKey key) {
-                return new BaseNetworkFile(data, filename, url, key);
+            public TransportableFile createTransportableFile(TransportableData data, String filename,
+                                                             URI url, DecryptKey key) {
+                return new PortableNetworkFile(data, filename, url, key);
             }
 
             @Override
-            public PortableNetworkFile parsePortableNetworkFile(Map<String, Object> pnf) {
+            public TransportableFile parseTransportableFile(Map<String, Object> pnf) {
                 // check 'data', 'URL', 'filename'
                 if (pnf.get("data") == null && pnf.get("URL") == null && pnf.get("filename") == null) {
                     // pnf.data and pnf.URL and pnf.filename should not be empty at the same time
                     assert false : "PNF error: " + pnf;
                     return null;
                 }
-                return new BaseNetworkFile(pnf);
+                return new PortableNetworkFile(pnf);
             }
         });
     }
     protected void registerTEDFactory() {
         // TED
-        TransportableData.Factory tedFactory = new TransportableData.Factory() {
+        TransportableData.setFactory(new TransportableData.Factory() {
 
             @Override
-            public TransportableData createTransportableData(byte[] data) {
-                return new Base64Data(data);
-            }
-
-            @Override
-            public TransportableData parseTransportableData(Map<String, Object> ted) {
-                // check 'data'
-                if (ted.get("data") == null) {
-                    // ted.data should not be empty
-                    assert false : "TED error: " + ted;
-                    return null;
+            public TransportableData parseTransportableData(String ted) {
+                EmbedData data = EmbedData.parse(ted);
+                if (data != null) {
+                    // "data:image/jpeg;base64,..."
+                    return data;
                 }
-                // TODO: 1. check algorithm
-                //       2. check data format
-                return new Base64Data(ted);
+                // TODO: check Base-64 format
+                // "{BASE64_ENCODED}"
+                return Base64Data.create(ted);
             }
-        };
-        TransportableData.setFactory(EncodeAlgorithms.BASE_64, tedFactory);
-        //TransportableData.setFactory(EncodeAlgorithms.DEFAULT, tedFactory);
-        TransportableData.setFactory("*", tedFactory);
+        });
     }
 
     /**

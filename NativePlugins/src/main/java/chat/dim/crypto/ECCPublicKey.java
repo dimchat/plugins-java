@@ -31,6 +31,8 @@ import chat.dim.digest.SHA256;
 import chat.dim.ecc.Secp256k1;
 import chat.dim.format.Hex;
 import chat.dim.format.PEM;
+import chat.dim.format.PlainData;
+import chat.dim.protocol.TransportableData;
 
 /**
  *  ECC Public Key
@@ -45,41 +47,49 @@ import chat.dim.format.PEM;
  */
 public final class ECCPublicKey extends BasePublicKey {
 
+    private byte[] publicKeyData;
+
     public ECCPublicKey(Map<String, Object> dictionary) {
         super(dictionary);
+        // lazy load
+        publicKeyData = null;
     }
 
     @Override
-    public byte[] getData() {
-        String pem = getString("data");
-        int size = pem == null ? 0 : pem.length();
-        if (size == 0) {
-            throw new AssertionError("ECC public key data not found");
-        }
-        if (size == 66 || size == 130) {
-            // Hex encode
-            return Hex.decode(pem);
-        } else {
-            // PEM
-            byte[] data = PEM.decodePublicKeyData(pem, "ECC");
-            assert data != null && data.length > 32 : "ECC public key data error: " + pem;
-            if (data.length > 65) {
-                // FIXME: X.509 -> Uncompressed Point
-                assert data.length == 88 : "unexpected ECC public key: " + pem;
-                if (data[88-65] == 0x04) {
-                    byte[] buffer = new byte[65];
-                    System.arraycopy(data, 88-65, buffer, 0, 65);
-                    data = buffer;
-                } else {
-                    throw new AssertionError("ECCKeyError: " + pem);
+    public TransportableData getData() {
+        byte[] data = publicKeyData;
+        if (data == null) {
+            String pem = getString("data");
+            int size = pem == null ? 0 : pem.length();
+            if (size == 0) {
+                throw new AssertionError("ECC public key data not found");
+            }
+            if (size == 66 || size == 130) {
+                // Hex encode
+                data = Hex.decode(pem);
+            } else {
+                // PEM
+                data = PEM.decodePublicKeyData(pem, "ECC");
+                assert data != null && data.length > 32 : "ECC public key data error: " + pem;
+                if (data.length > 65) {
+                    // FIXME: X.509 -> Uncompressed Point
+                    assert data.length == 88 : "unexpected ECC public key: " + pem;
+                    if (data[88-65] == 0x04) {
+                        byte[] buffer = new byte[65];
+                        System.arraycopy(data, 88-65, buffer, 0, 65);
+                        data = buffer;
+                    } else {
+                        throw new AssertionError("ECCKeyError: " + pem);
+                    }
                 }
             }
-            return data;
+            publicKeyData = data;
         }
+        return PlainData.create(data);
     }
 
     private byte[] getPubKey() {
-        byte[] data = getData();
+        byte[] data = getData().getBytes();
         if (data.length == 65) {
             byte[] buffer = new byte[64];
             System.arraycopy(data, 1, buffer, 0, 64);

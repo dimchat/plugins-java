@@ -36,8 +36,10 @@ import java.security.Signature;
 import java.security.SignatureException;
 import java.util.Map;
 
+import chat.dim.format.PlainData;
 import chat.dim.format.RSAKeys;
 import chat.dim.protocol.EncryptKey;
+import chat.dim.protocol.TransportableData;
 import chat.dim.utils.CryptoUtils;
 
 /**
@@ -77,8 +79,12 @@ public final class RSAPublicKey extends BasePublicKey implements EncryptKey {
     }
 
     @Override
-    public byte[] getData() {
-        return publicKey == null ? null : publicKey.getEncoded();
+    public TransportableData getData() {
+        if (publicKey == null) {
+            throw new NullPointerException("RSA public key not found");
+        }
+        byte[] data = publicKey.getEncoded();
+        return PlainData.create(data);
     }
 
     @Override

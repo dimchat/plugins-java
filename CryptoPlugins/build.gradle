@@ -7,7 +7,7 @@ plugins {
 }
 
 group = 'chat.dim'
-version = '2.2.0'
+version = '2.3.0'
 //version '1.0-SNAPSHOT'
 
 def mod = 'CryptoPlugins'
@@ -31,13 +31,13 @@ repositories {
 }
 
 dependencies {
-    api group: 'chat.dim', name: 'DIMP', version: '2.2.0'
+    api group: 'chat.dim', name: 'DIMP', version: '2.3.0'
 
     implementation group: 'com.alibaba', name: 'fastjson', version: '1.2.80'
     implementation group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.60'
 
-    testImplementation group: 'chat.dim', name: 'SDK', version: '2.2.0'
-    testImplementation group: 'chat.dim', name: 'Plugins', version: '2.2.0'
+    testImplementation group: 'chat.dim', name: 'SDK', version: '2.3.0'
+    testImplementation group: 'chat.dim', name: 'Plugins', version: '2.3.0'
     testImplementation group: 'junit', name: 'junit', version: '4.12'
 }
 
