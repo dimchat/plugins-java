@@ -39,6 +39,7 @@ import java.security.SignatureException;
 import java.util.HashMap;
 import java.util.Map;
 
+import chat.dim.ext.GeneralCryptoHelper;
 import chat.dim.format.PlainData;
 import chat.dim.format.RSAKeys;
 import chat.dim.protocol.AsymmetricAlgorithms;
@@ -176,7 +177,7 @@ public final class RSAPrivateKey extends BasePrivateKey implements DecryptKey {
 
     @Override
     public boolean matchEncryptKey(EncryptKey pKey) {
-        return BaseKey.matchEncryptKey(pKey, this);
+        return GeneralCryptoHelper.matchSymmetricKeys(pKey, this);
     }
 
 }
