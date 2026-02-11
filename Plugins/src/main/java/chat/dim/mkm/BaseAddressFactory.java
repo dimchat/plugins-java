@@ -30,9 +30,7 @@
  */
 package chat.dim.mkm;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import chat.dim.mem.SharedAccountCache;
 import chat.dim.protocol.Address;
 import chat.dim.protocol.Meta;
 
@@ -41,24 +39,22 @@ import chat.dim.protocol.Meta;
  */
 public class BaseAddressFactory implements Address.Factory {
 
-    protected final Map<String, Address> addresses = new HashMap<>();
-
     @Override
     public Address generateAddress(Meta meta, int network) {
         Address address = meta.generateAddress(network);
         if (address != null) {
-            addresses.put(address.toString(), address);
+            SharedAccountCache.addressCache.put(address.toString(), address);
         }
         return address;
     }
 
     @Override
     public Address parseAddress(String address) {
-        Address add = addresses.get(address);
+        Address add = SharedAccountCache.addressCache.get(address);
         if (add == null) {
             add = parse(address);
             if (add != null) {
-                addresses.put(address, add);
+                SharedAccountCache.addressCache.put(address, add);
             }
         }
         return add;

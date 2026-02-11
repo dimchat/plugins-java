@@ -170,48 +170,48 @@ public class ExtensionLoader {
     protected void registerContentFactories() {
 
         // Text
-        setContentFactory(ContentType.TEXT, "text", BaseTextContent::new);
+        Content.setFactory(ContentType.TEXT, BaseTextContent::new);
 
         // File
-        setContentFactory(ContentType.FILE, "file", BaseFileContent::new);
+        Content.setFactory(ContentType.FILE, BaseFileContent::new);
         // Image
-        setContentFactory(ContentType.IMAGE, "image", ImageFileContent::new);
+        Content.setFactory(ContentType.IMAGE, ImageFileContent::new);
         // Audio
-        setContentFactory(ContentType.AUDIO, "audio", AudioFileContent::new);
+        Content.setFactory(ContentType.AUDIO, AudioFileContent::new);
         // Video
-        setContentFactory(ContentType.VIDEO, "video", VideoFileContent::new);
+        Content.setFactory(ContentType.VIDEO, VideoFileContent::new);
 
         // Web Page
-        setContentFactory(ContentType.PAGE, "page", WebPageContent::new);
+        Content.setFactory(ContentType.PAGE, WebPageContent::new);
 
         // Name Card
-        setContentFactory(ContentType.NAME_CARD, "card", NameCardContent::new);
+        Content.setFactory(ContentType.NAME_CARD, NameCardContent::new);
 
         // Quote
-        setContentFactory(ContentType.QUOTE, "quote", BaseQuoteContent::new);
+        Content.setFactory(ContentType.QUOTE, BaseQuoteContent::new);
 
         // Money
-        setContentFactory(ContentType.MONEY, "money", BaseMoneyContent::new);
-        setContentFactory(ContentType.TRANSFER, "transfer", TransferMoneyContent::new);
+        Content.setFactory(ContentType.MONEY, BaseMoneyContent::new);
+        Content.setFactory(ContentType.TRANSFER, TransferMoneyContent::new);
         // ...
 
         // Command
-        setContentFactory(ContentType.COMMAND, "command", new GeneralCommandFactory());
+        Content.setFactory(ContentType.COMMAND, new GeneralCommandFactory());
 
         // History Command
-        setContentFactory(ContentType.HISTORY, "history", new HistoryCommandFactory());
+        Content.setFactory(ContentType.HISTORY, new HistoryCommandFactory());
 
         // Content Array
-        setContentFactory(ContentType.ARRAY, "array", ListContent::new);
+        Content.setFactory(ContentType.ARRAY, ListContent::new);
 
         // Combine and Forward
-        setContentFactory(ContentType.COMBINE_FORWARD, "combine", CombineForwardContent::new);
+        Content.setFactory(ContentType.COMBINE_FORWARD, CombineForwardContent::new);
 
         // Top-Secret
-        setContentFactory(ContentType.FORWARD, "forward", SecretContent::new);
+        Content.setFactory(ContentType.FORWARD, SecretContent::new);
 
         // unknown content type
-        setContentFactory(ContentType.ANY, "*", BaseContent::new);
+        Content.setFactory(ContentType.ANY, BaseContent::new);
 
         // Application Customized Content
         registerCustomizedFactories();
@@ -223,18 +223,9 @@ public class ExtensionLoader {
     protected void registerCustomizedFactories() {
 
         // Application Customized
-        setContentFactory(ContentType.CUSTOMIZED, "customized", AppCustomizedContent::new);
-        //setContentFactory(ContentType.APPLICATION, "application", AppCustomizedContent::new);
+        Content.setFactory(ContentType.CUSTOMIZED, AppCustomizedContent::new);
+        //Content.setFactory(ContentType.APPLICATION, "application", AppCustomizedContent::new);
 
-    }
-
-    protected void setContentFactory(String type, String alias, Content.Factory factory) {
-        Content.setFactory(type, factory);
-        Content.setFactory(alias, factory);
-    }
-
-    protected void setCommandFactory(String cmd, Command.Factory factory) {
-        Command.setFactory(cmd, factory);
     }
 
     /**
@@ -243,24 +234,24 @@ public class ExtensionLoader {
     protected void registerCommandFactories() {
 
         // Meta Command
-        setCommandFactory(Command.META, BaseMetaCommand::new);
+        Command.setFactory(Command.META, BaseMetaCommand::new);
 
         // Documents Command
-        setCommandFactory(Command.DOCUMENTS, BaseDocumentCommand::new);
+        Command.setFactory(Command.DOCUMENTS, BaseDocumentCommand::new);
 
         // Receipt Command
-        setCommandFactory(Command.RECEIPT, BaseReceiptCommand::new);
+        Command.setFactory(Command.RECEIPT, BaseReceiptCommand::new);
 
         // Group Commands
-        setCommandFactory("group", new GroupCommandFactory());
-        setCommandFactory(GroupCommand.INVITE,  InviteGroupCommand::new);
+        Command.setFactory("group", new GroupCommandFactory());
+        Command.setFactory(GroupCommand.INVITE,  InviteGroupCommand::new);
         // 'expel' is deprecated (use 'reset' instead)
-        setCommandFactory(GroupCommand.EXPEL,   ExpelGroupCommand::new);
-        setCommandFactory(GroupCommand.JOIN,    JoinGroupCommand::new);
-        setCommandFactory(GroupCommand.QUIT,    QuitGroupCommand::new);
+        Command.setFactory(GroupCommand.EXPEL,   ExpelGroupCommand::new);
+        Command.setFactory(GroupCommand.JOIN,    JoinGroupCommand::new);
+        Command.setFactory(GroupCommand.QUIT,    QuitGroupCommand::new);
         // 'query' is deprecated
-        //setCommandFactory(GroupCommand.QUERY, QueryGroupCommand::new);
-        setCommandFactory(GroupCommand.RESET,   ResetGroupCommand::new);
+        //Command.setFactory(GroupCommand.QUERY, QueryGroupCommand::new);
+        Command.setFactory(GroupCommand.RESET,   ResetGroupCommand::new);
     }
 
 }

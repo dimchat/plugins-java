@@ -30,9 +30,7 @@
  */
 package chat.dim.mkm;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import chat.dim.mem.SharedAccountCache;
 import chat.dim.protocol.Address;
 import chat.dim.protocol.ID;
 import chat.dim.protocol.Meta;
@@ -41,8 +39,6 @@ import chat.dim.protocol.Meta;
  *  General ID Factory
  */
 public class IdentifierFactory implements ID.Factory {
-
-    protected final Map<String, ID> identifiers = new HashMap<>();
 
     @Override
     public ID generateID(Meta meta, int network, String terminal) {
@@ -54,21 +50,21 @@ public class IdentifierFactory implements ID.Factory {
     @Override
     public ID createID(String name, Address address, String terminal) {
         String identifier = Identifier.concat(name, address, terminal);
-        ID did = identifiers.get(identifier);
+        ID did = SharedAccountCache.idCache.get(identifier);
         if (did == null) {
             did = newID(identifier, name, address, terminal);
-            identifiers.put(identifier, did);
+            SharedAccountCache.idCache.put(identifier, did);
         }
         return did;
     }
 
     @Override
     public ID parseID(String identifier) {
-        ID did = identifiers.get(identifier);
+        ID did = SharedAccountCache.idCache.get(identifier);
         if (did == null) {
             did = parse(identifier);
             if (did != null) {
-                identifiers.put(identifier, did);
+                SharedAccountCache.idCache.put(identifier, did);
             }
         }
         return did;
