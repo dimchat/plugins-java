@@ -149,7 +149,7 @@ public class FormatGeneralFactory implements TransportableFileHelper,
         // 2. check for data URI: "data:image/jpeg;base64,..."
         DataURI uri = DataURI.parse(text);
         if (uri != null) {
-            String filename = uri.getFilename();
+            String filename = uri.getHeader("filename");
             if (filename != null) {
                 content.put("filename", filename);
             }

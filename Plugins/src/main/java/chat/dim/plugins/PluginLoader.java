@@ -179,12 +179,7 @@ public class PluginLoader {
                     String encoding = uri.head.encoding;
                     if (BaseData.BASE_64.equalsIgnoreCase(encoding)) {
                         // "data:image/jpeg;base64,..."
-                        return new EmbedData(uri) {
-                            @Override
-                            protected DataCoder getDataCoder() {
-                                return Base64.coder;
-                            }
-                        };
+                        return EmbedData.create(uri);
                     }
                     // TODO: other encoding?
                     assert false : "TED encoding error: " + encoding;

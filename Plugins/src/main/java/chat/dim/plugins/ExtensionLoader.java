@@ -41,7 +41,6 @@ import chat.dim.dkd.ListContent;
 import chat.dim.dkd.NameCardContent;
 import chat.dim.dkd.SecretContent;
 import chat.dim.dkd.WebPageContent;
-import chat.dim.dkd.app.AppCustomizedContent;
 import chat.dim.dkd.asset.BaseMoneyContent;
 import chat.dim.dkd.asset.TransferMoneyContent;
 import chat.dim.dkd.cmd.BaseDocumentCommand;
@@ -212,19 +211,6 @@ public class ExtensionLoader {
 
         // unknown content type
         Content.setFactory(ContentType.ANY, BaseContent::new);
-
-        // Application Customized Content
-        registerCustomizedFactories();
-    }
-
-    /**
-     *  Customized content factories
-     */
-    protected void registerCustomizedFactories() {
-
-        // Application Customized
-        Content.setFactory(ContentType.CUSTOMIZED, AppCustomizedContent::new);
-        //Content.setFactory(ContentType.APPLICATION, "application", AppCustomizedContent::new);
 
     }
 
