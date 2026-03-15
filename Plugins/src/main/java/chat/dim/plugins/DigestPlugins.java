@@ -2,12 +2,12 @@
  *
  *  DIMP : Decentralized Instant Messaging Protocol
  *
- *                                Written in 2022 by Moky <albert.moky@gmail.com>
+ *                                Written in 2026 by Moky <albert.moky@gmail.com>
  *
  * ==============================================================================
  * The MIT License (MIT)
  *
- * Copyright (c) 2022 Albert Moky
+ * Copyright (c) 2026 Albert Moky
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,48 +30,45 @@
  */
 package chat.dim.plugins;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
-/**
- *  Core Extensions Loader
- */
-public class ExtensionLoader implements CoreExtensions, MessageFactoryExtensions {
+import chat.dim.digest.MessageDigester;
+import chat.dim.digest.SHA256;
 
-    /**
-     *  Register core factories
-     */
-    public void load() {
 
-        loadCoreHelpers();
+// MixIn
+public interface DigestPlugins {
 
-        loadCoreFactories();
+    // protected
+    default void registerSHA256Digester() {
 
-    }
+        // SHA256
+        SHA256.digester = new MessageDigester() {
 
-    /**
-     *  Core extensions
-     */
-    protected void loadCoreHelpers() {
-
-        registerCryptoHelpers();
-        registerFormatHelpers();
-
-        registerAccountHelpers();
-
-        registerMessageHelpers();
-        registerCommandHelpers();
-
-    }
-
-    /**
-     *  Message Factories
-     */
-    protected void loadCoreFactories() {
-
-        registerMessageFactories();
-
-        registerContentFactories();
-        registerCommandFactories();
+            @Override
+            public byte[] digest(byte[] data) {
+                MessageDigest md;
+                try {
+                    md = MessageDigest.getInstance("SHA-256");
+                } catch (NoSuchAlgorithmException e) {
+                    e.printStackTrace();
+                    return null;
+                }
+                md.reset();
+                md.update(data);
+                return md.digest();
+            }
+        };
 
     }
+
+    /*/
+    // protected
+    void registerKECCAK256Digester();
+
+    // protected
+    void registerRIPEMD160Digester();
+    /*/
 
 }

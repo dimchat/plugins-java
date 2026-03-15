@@ -96,17 +96,17 @@ public class BaseMetaFactory implements Meta.Factory {
     @Override
     public Meta parseMeta(Map<String, Object> info) {
         // check 'type', 'key', 'seed', 'fingerprint'
-        if (info.get("type") == null || info.get("key") == null) {
+        if (!info.containsKey("type") || !info.containsKey("key")) {
             // meta.type should not be empty
             // meta.key should not be empty
             assert false : "meta error: " + info;
             return null;
-        } else if (info.get("seed") == null) {
-            if (info.get("fingerprint") != null) {
+        } else if (!info.containsKey("seed")) {
+            if (info.containsKey("fingerprint")) {
                 assert false : "meta error: " + info;
                 return null;
             }
-        } else if (info.get("fingerprint") == null) {
+        } else if (!info.containsKey("fingerprint")) {
             assert false : "meta error: " + info;
             return null;
         }

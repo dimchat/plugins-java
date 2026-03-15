@@ -53,11 +53,13 @@ public class GeneralDocumentFactory implements Document.Factory {
     public Document createDocument(String data, TransportableData signature) {
         if (data == null || data.isEmpty()) {
             assert signature == null : "document error: " + data + ", signature: " + signature;
-            // create empty document
+            // 1. create empty document
+            return createEmptyDocument();
+        } else if (signature == null || signature.isEmpty()) {
+            assert false : "document error: " + data + ", signature: " + signature;
             return createEmptyDocument();
         }
-        assert signature != null : "document error: " + data;
-        // create document with data & signature from local storage
+        // 2. create document with data & signature from local storage
         return createValidDocument(data, signature);
     }
     protected Document createEmptyDocument() {
@@ -103,12 +105,12 @@ public class GeneralDocumentFactory implements Document.Factory {
     @Override
     public Document parseDocument(Map<String, Object> info) {
         // check 'did', 'data', 'signature'
-        if (info.get("data") == null || info.get("signature") == null) {
+        if (!info.containsKey("data") || !info.containsKey("signature")) {
             // doc.data should not be empty
             // doc.signature should not be empty
             assert false : "document error: " + info;
             return null;
-        //} else if (info.get("did") == null) {
+        //} else if (!info.containsKey("did")) {
         //    // doc.did should not be empty
         //    assert false : "document error: " + info;
         //    return null;

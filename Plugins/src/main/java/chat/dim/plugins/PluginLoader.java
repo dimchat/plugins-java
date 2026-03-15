@@ -25,301 +25,85 @@
  */
 package chat.dim.plugins;
 
-import java.net.URI;
-import java.nio.charset.Charset;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Map;
 
-import chat.dim.crypto.AESKey;
-import chat.dim.crypto.BaseSymmetricKey;
-import chat.dim.crypto.PlainKey;
-import chat.dim.digest.MessageDigester;
-import chat.dim.digest.SHA256;
-import chat.dim.format.Base58;
-import chat.dim.format.Base64;
-import chat.dim.format.Base64Data;
-import chat.dim.format.BaseData;
-import chat.dim.format.DataCoder;
-import chat.dim.format.EmbedData;
-import chat.dim.format.Hex;
-import chat.dim.format.HexCoder;
-import chat.dim.format.PortableNetworkFile;
-import chat.dim.format.StringCoder;
-import chat.dim.format.UTF8;
-import chat.dim.mkm.BaseAddressFactory;
-import chat.dim.mkm.BaseMetaFactory;
-import chat.dim.mkm.GeneralDocumentFactory;
-import chat.dim.mkm.IdentifierFactory;
-import chat.dim.protocol.Address;
-import chat.dim.protocol.DecryptKey;
-import chat.dim.protocol.Document;
-import chat.dim.protocol.DocumentType;
-import chat.dim.protocol.ID;
-import chat.dim.protocol.Meta;
-import chat.dim.protocol.MetaType;
-import chat.dim.protocol.SymmetricAlgorithms;
-import chat.dim.protocol.SymmetricKey;
-import chat.dim.protocol.TransportableData;
-import chat.dim.protocol.TransportableFile;
-import chat.dim.rfc.DataURI;
-
-public class PluginLoader {
+/**
+ *  Core Plugins Loader
+ */
+public class PluginLoader implements CoderPlugins, TransportablePlugins, DigestPlugins, CryptoPlugins, EntityPlugins {
 
     /**
      *  Register plugins
      */
     public void load() {
 
-        registerCoders();
-        registerDigesters();
+        loadCoders();
 
-        registerSymmetricKeyFactories();
+        loadDigesters();
 
-        registerEntityFactories();
+        loadCryptoKeyFactories();
+
+        loadEntityFactories();
 
     }
 
     /**
      *  Data coders
      */
-    protected void registerCoders() {
+    protected void loadCoders() {
 
         registerBase58Coder();
         registerBase64Coder();
         registerHexCoder();
 
         registerUTF8Coder();
+        //registerJSONCoder();
 
         registerPNFFactory();
         registerTEDFactory();
 
     }
-    protected void registerBase58Coder() {
-        // Base58 coding
-        Base58.coder = new DataCoder() {
-
-            @Override
-            public String encode(byte[] data) {
-                return chat.dim.bitcoinj.Base58.encode(data);
-            }
-
-            @Override
-            public byte[] decode(String string) {
-                return chat.dim.bitcoinj.Base58.decode(string);
-            }
-        };
-    }
-    protected void registerBase64Coder() {
-        // Base64 coding
-        Base64.coder = new DataCoder() {
-
-            @Override
-            public String encode(byte[] data) {
-                return java.util.Base64.getEncoder().encodeToString(data);
-            }
-
-            @Override
-            public byte[] decode(String string) {
-                return java.util.Base64.getDecoder().decode(string);
-            }
-        };
-    }
-    protected void registerHexCoder() {
-        // HEX coding
-        Hex.coder = new HexCoder();
-    }
-    protected void registerUTF8Coder() {
-        // UTF8
-        UTF8.coder = new StringCoder() {
-
-            @SuppressWarnings("CharsetObjectCanBeUsed")
-            @Override
-            public byte[] encode(String string) {
-                return string.getBytes(Charset.forName("UTF-8"));
-            }
-
-            @SuppressWarnings("CharsetObjectCanBeUsed")
-            @Override
-            public String decode(byte[] utf8) {
-                return new String(utf8, Charset.forName("UTF-8"));
-            }
-        };
-    }
-    protected void registerPNFFactory() {
-        // PNF
-        TransportableFile.setFactory(new TransportableFile.Factory() {
-
-            @Override
-            public TransportableFile createTransportableFile(TransportableData data, String filename,
-                                                             URI url, DecryptKey key) {
-                return new PortableNetworkFile(data, filename, url, key);
-            }
-
-            @Override
-            public TransportableFile parseTransportableFile(Map<String, Object> pnf) {
-                // check 'data', 'URL', 'filename'
-                if (pnf.get("data") == null && pnf.get("URL") == null && pnf.get("filename") == null) {
-                    // pnf.data and pnf.URL and pnf.filename should not be empty at the same time
-                    assert false : "PNF error: " + pnf;
-                    return null;
-                }
-                return new PortableNetworkFile(pnf);
-            }
-        });
-    }
-    protected void registerTEDFactory() {
-        // TED
-        TransportableData.setFactory(new TransportableData.Factory() {
-
-            @Override
-            public TransportableData parseTransportableData(String ted) {
-                DataURI uri = DataURI.parse(ted);
-                if (uri != null) {
-                    String encoding = uri.head.encoding;
-                    if (BaseData.BASE_64.equalsIgnoreCase(encoding)) {
-                        // "data:image/jpeg;base64,..."
-                        return EmbedData.create(uri);
-                    }
-                    // TODO: other encoding?
-                    assert false : "TED encoding error: " + encoding;
-                    return null;
-                }
-                // TODO: check Base-64 format
-                // "{BASE64_ENCODED}"
-                return Base64Data.create(ted);
-            }
-        });
-    }
 
     /**
      *  Message digesters
      */
-    protected void registerDigesters() {
+    protected void loadDigesters() {
 
         registerSHA256Digester();
 
-    }
-    protected void registerSHA256Digester() {
-        // SHA256
-        SHA256.digester = new MessageDigester() {
+        //registerKECCAK256Digester();
 
-            @Override
-            public byte[] digest(byte[] data) {
-                MessageDigest md;
-                try {
-                    md = MessageDigest.getInstance("SHA-256");
-                } catch (NoSuchAlgorithmException e) {
-                    e.printStackTrace();
-                    return null;
-                }
-                md.reset();
-                md.update(data);
-                return md.digest();
-            }
-        };
+        //registerRIPEMD160Digester();
     }
 
     /**
-     *  Symmetric key parsers
+     *  Crypto key parsers
      */
-    protected void registerSymmetricKeyFactories() {
+    protected void loadCryptoKeyFactories() {
 
+        // Symmetric keys
         registerAESKeyFactory();
-
         registerPlainKeyFactory();
 
-    }
-    protected void registerAESKeyFactory() {
-        SymmetricKey.Factory aes = new SymmetricKey.Factory() {
+        /*/
+        // Asymmetric keys
+        registerRSAKeyFactories();
+        registerECCKeyFactories();
+        /*/
 
-            @Override
-            public SymmetricKey generateSymmetricKey() {
-                return AESKey.newKey();
-            }
-
-            @Override
-            public SymmetricKey parseSymmetricKey(Map<String, Object> key) {
-                // check 'data', 'algorithm'
-                if (key.get("data") == null || key.get("algorithm") == null) {
-                    // key.data should not be empty
-                    // key.algorithm should not be empty
-                    assert false : "AES key error: " + key;
-                    return null;
-                }
-                return new AESKey(key);
-            }
-        };
-        SymmetricKey.setFactory(SymmetricAlgorithms.AES, aes);
-        SymmetricKey.setFactory(AESKey.AES_CBC_PKCS7, aes);
-        //SymmetricKey.setFactory("AES/CBC/PKCS7Padding", aes);
-    }
-    protected void registerPlainKeyFactory() {
-        SymmetricKey.setFactory(SymmetricAlgorithms.PLAIN, new SymmetricKey.Factory() {
-
-            @Override
-            public SymmetricKey generateSymmetricKey() {
-                return PlainKey.getInstance();
-            }
-
-            @Override
-            public SymmetricKey parseSymmetricKey(Map<String, Object> key) {
-                // check 'algorithm'
-                String algorithm = BaseSymmetricKey.getKeyAlgorithm(key);
-                if (!SymmetricAlgorithms.PLAIN.equals(algorithm)) {
-                    // algorithm not matched
-                    assert false : "Plain key error: " + key;
-                    return null;
-                }
-                return PlainKey.getInstance();
-            }
-        });
     }
 
     /**
      *  ID, Address, Meta, Document parsers
      */
-    protected void registerEntityFactories() {
+    protected void loadEntityFactories() {
 
         registerIDFactory();
         registerAddressFactory();
+
         registerMetaFactories();
+
         registerDocumentFactories();
 
-    }
-    protected void registerIDFactory() {
-
-        ID.setFactory(new IdentifierFactory());
-    }
-    protected void registerAddressFactory() {
-
-        Address.setFactory(new BaseAddressFactory());
-    }
-    protected void registerMetaFactories() {
-
-        setMetaFactory(MetaType.MKM, "mkm", null);
-        setMetaFactory(MetaType.BTC, "btc", null);
-        setMetaFactory(MetaType.ETH, "eth", null);
-    }
-    protected void setMetaFactory(String type, String alias, Meta.Factory factory) {
-        if (factory == null) {
-            factory = new BaseMetaFactory(type);
-        }
-        Meta.setFactory(type, factory);
-        Meta.setFactory(alias, factory);
-    }
-    protected void registerDocumentFactories() {
-
-        setDocumentFactory("*", null);
-        setDocumentFactory(DocumentType.VISA, null);
-        setDocumentFactory(DocumentType.PROFILE, null);
-        setDocumentFactory(DocumentType.BULLETIN, null);
-    }
-    protected void setDocumentFactory(String type, Document.Factory factory) {
-        if (factory == null) {
-            factory = new GeneralDocumentFactory(type);
-        }
-        Document.setFactory(type, factory);
     }
 
 }
