@@ -29,7 +29,7 @@ package chat.dim.plugins;
 /**
  *  Core Plugins Loader
  */
-public class PluginLoader implements CoderPlugins, TransportablePlugins, DigestPlugins, CryptoPlugins, EntityPlugins {
+public class PluginLoader implements CoderPlugins, TransportablePlugins, DigestPlugins, CryptoPlugins {
 
     /**
      *  Register plugins
@@ -42,7 +42,6 @@ public class PluginLoader implements CoderPlugins, TransportablePlugins, DigestP
 
         loadCryptoKeyFactories();
 
-        loadEntityFactories();
 
     }
 
@@ -89,20 +88,6 @@ public class PluginLoader implements CoderPlugins, TransportablePlugins, DigestP
         registerRSAKeyFactories();
         registerECCKeyFactories();
         /*/
-
-    }
-
-    /**
-     *  ID, Address, Meta, Document parsers
-     */
-    protected void loadEntityFactories() {
-
-        registerIDFactory();
-        registerAddressFactory();
-
-        registerMetaFactories();
-
-        registerDocumentFactories();
 
     }
 

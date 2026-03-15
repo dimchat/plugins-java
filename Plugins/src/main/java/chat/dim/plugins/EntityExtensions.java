@@ -43,7 +43,7 @@ import chat.dim.protocol.MetaType;
 
 
 // MixIn
-public interface EntityPlugins {
+public interface EntityExtensions {
 
     // protected
     default void registerIDFactory() {

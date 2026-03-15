@@ -25,32 +25,16 @@
  */
 package chat.dim.plugins;
 
-import java.security.InvalidAlgorithmParameterException;
-import java.security.NoSuchAlgorithmException;
 import java.security.Provider;
 import java.security.Security;
-import java.util.Map;
 
-import com.alibaba.fastjson.serializer.SerializerFeature;
-import org.bouncycastle.crypto.digests.KeccakDigest;
-import org.bouncycastle.crypto.digests.RIPEMD160Digest;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
-import chat.dim.crypto.ECCPrivateKey;
-import chat.dim.crypto.ECCPublicKey;
-import chat.dim.crypto.RSAPrivateKey;
-import chat.dim.crypto.RSAPublicKey;
-import chat.dim.digest.KECCAK256;
-import chat.dim.digest.MessageDigester;
-import chat.dim.digest.RIPEMD160;
-import chat.dim.format.JSON;
-import chat.dim.format.ObjectCoder;
-import chat.dim.protocol.AsymmetricAlgorithms;
-import chat.dim.protocol.PrivateKey;
-import chat.dim.protocol.PublicKey;
-import chat.dim.utils.CryptoUtils;
 
-public class CryptoPluginLoader {
+/**
+ *  Extra Plugins Loader
+ */
+public class CryptoPluginLoader implements JsonCoderPlugins, MessageDigestPlugins, AsymmetricPlugins {
 
     /**
      *  Register core factories
@@ -58,10 +42,11 @@ public class CryptoPluginLoader {
     public void load() {
         prepare();
 
-        registerCoders();
-        registerDigesters();
+        loadCoders();
 
-        registerAsymmetricKeyFactories();
+        loadDigesters();
+
+        loadCryptoKeyFactories();
 
     }
 
@@ -86,173 +71,51 @@ public class CryptoPluginLoader {
     /**
      *  Data coders
      */
-    protected void registerCoders() {
+    protected void loadCoders() {
 
+        /*/
+        registerBase58Coder();
+        registerBase64Coder();
+        registerHexCoder();
+
+        registerUTF8Coder();
+        /*/
         registerJSONCoder();
 
-    }
-    protected void registerJSONCoder() {
-
-        JSON.coder = new ObjectCoder<Object>() {
-
-            @Override
-            public String encode(Object container) {
-                /*/
-                String s = com.alibaba.fastjson.JSON.toJSONString(container);
-                return s.getBytes(Charset.forName("UTF-8"));
-                */
-                return com.alibaba.fastjson.JSON.toJSONString(container,
-                        SerializerFeature.DisableCircularReferenceDetect);
-                //return com.alibaba.fastjson.JSON.toJSONString(container);
-            }
-
-            @Override
-            public Object decode(String json) {
-                return com.alibaba.fastjson.JSON.parse(json);
-            }
-        };
+        /*/
+        registerPNFFactory();
+        registerTEDFactory();
+        /*/
 
     }
 
     /**
      *  Message digesters
      */
-    protected void registerDigesters() {
+    protected void loadDigesters() {
+
+        //registerSHA256Digester();
 
         registerRIPEMD160Digester();
 
         registerKeccak256Digester();
 
     }
-    protected void registerRIPEMD160Digester() {
-        RIPEMD160.digester = new MessageDigester() {
-            @Override
-            public byte[] digest(byte[] data) {
-                RIPEMD160Digest digest = new RIPEMD160Digest();
-                digest.update(data, 0, data.length);
-                byte[] out = new byte[20];
-                digest.doFinal(out, 0);
-                return out;
-            }
-        };
-    }
-    protected void registerKeccak256Digester() {
-        KECCAK256.digester = new MessageDigester() {
-            @Override
-            public byte[] digest(byte[] data) {
-                KeccakDigest digest = new KeccakDigest(256);
-                digest.update(data, 0, data.length);
-                byte[] out = new byte[digest.getDigestSize()];
-                digest.doFinal(out, 0);
-                return out;
-            }
-        };
-    }
 
     /**
-     *  Asymmetric key parsers
+     *  Crypto key parsers
      */
-    protected void registerAsymmetricKeyFactories() {
+    protected void loadCryptoKeyFactories() {
 
+        /*/
+        // Symmetric keys
+        registerAESKeyFactory();
+        registerPlainKeyFactory();
+        /*/
+
+        // Asymmetric keys
         registerRSAKeyFactories();
-
         registerECCKeyFactories();
-
-    }
-    protected void registerRSAKeyFactories() {
-
-        PrivateKey.Factory rsaPri = new PrivateKey.Factory() {
-
-            @Override
-            public PrivateKey generatePrivateKey() {
-                try {
-                    return RSAPrivateKey.newKey();
-                } catch (NoSuchAlgorithmException e) {
-                    e.printStackTrace();
-                    return null;
-                }
-            }
-
-            @Override
-            public PrivateKey parsePrivateKey(Map<String, Object> key) {
-                // check 'data', 'algorithm'
-                if (key.get("data") == null || key.get("algorithm") == null) {
-                    // key.data should not be empty
-                    // key.algorithm should not be empty
-                    assert false : "RSA key error: " + key;
-                    return null;
-                }
-                return new RSAPrivateKey(key);
-            }
-        };
-        PrivateKey.setFactory(AsymmetricAlgorithms.RSA, rsaPri);
-        PrivateKey.setFactory(CryptoUtils.RSA_SHA256, rsaPri);
-        PrivateKey.setFactory(CryptoUtils.RSA_ECB_PKCS1, rsaPri);
-
-        PublicKey.Factory rsaPub = new PublicKey.Factory() {
-
-            @Override
-            public PublicKey parsePublicKey(Map<String, Object> key) {
-                // check 'data', 'algorithm'
-                if (key.get("data") == null || key.get("algorithm") == null) {
-                    // key.data should not be empty
-                    // key.algorithm should not be empty
-                    assert false : "RSA key error: " + key;
-                    return null;
-                }
-                return new RSAPublicKey(key);
-            }
-        };
-        PublicKey.setFactory(AsymmetricAlgorithms.RSA, rsaPub);
-        PublicKey.setFactory(CryptoUtils.RSA_SHA256, rsaPub);
-        PublicKey.setFactory(CryptoUtils.RSA_ECB_PKCS1, rsaPub);
-
-    }
-    protected void registerECCKeyFactories() {
-
-        PrivateKey.Factory eccPri = new PrivateKey.Factory() {
-
-            @Override
-            public PrivateKey generatePrivateKey() {
-                try {
-                    return ECCPrivateKey.newKey();
-                } catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException e) {
-                    e.printStackTrace();
-                    return null;
-                }
-            }
-
-            @Override
-            public PrivateKey parsePrivateKey(Map<String, Object> key) {
-                // check 'data', 'algorithm'
-                if (key.get("data") == null || key.get("algorithm") == null) {
-                    // key.data should not be empty
-                    // key.algorithm should not be empty
-                    assert false : "ECC key error: " + key;
-                    return null;
-                }
-                return new ECCPrivateKey(key);
-            }
-        };
-        PrivateKey.setFactory(AsymmetricAlgorithms.ECC, eccPri);
-        PrivateKey.setFactory(CryptoUtils.ECDSA_SHA256, eccPri);
-
-        PublicKey.Factory eccPub = new PublicKey.Factory() {
-
-            @Override
-            public PublicKey parsePublicKey(Map<String, Object> key) {
-                // check 'data', 'algorithm'
-                if (key.get("data") == null || key.get("algorithm") == null) {
-                    // key.data should not be empty
-                    // key.algorithm should not be empty
-                    assert false : "ECC key error: " + key;
-                    return null;
-                }
-                return new ECCPublicKey(key);
-            }
-        };
-        PublicKey.setFactory(AsymmetricAlgorithms.ECC, eccPub);
-        PublicKey.setFactory(CryptoUtils.ECDSA_SHA256, eccPub);
 
     }
 

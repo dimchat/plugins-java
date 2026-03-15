@@ -1,13 +1,8 @@
 /* license: https://mit-license.org
- *
- *  DIMP : Decentralized Instant Messaging Protocol
- *
- *                                Written in 2022 by Moky <albert.moky@gmail.com>
- *
  * ==============================================================================
  * The MIT License (MIT)
  *
- * Copyright (c) 2022 Albert Moky
+ * Copyright (c) 2026 Albert Moky
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,63 +25,37 @@
  */
 package chat.dim.plugins;
 
+import com.alibaba.fastjson.serializer.SerializerFeature;
 
-/**
- *  Core Extensions Loader
- */
-public class ExtensionLoader implements CoreExtensions, EntityExtensions, MessageFactoryExtensions {
+import chat.dim.format.JSON;
+import chat.dim.format.ObjectCoder;
 
-    /**
-     *  Register core factories
-     */
-    public void load() {
 
-        loadCoreHelpers();
+// MixIn
+public interface JsonCoderPlugins {
 
-        loadEntityFactories();
+    // protected
+    default void registerJSONCoder() {
 
-        loadMessageFactories();
+        // JsON
+        JSON.coder = new ObjectCoder<Object>() {
 
-    }
+            @Override
+            public String encode(Object container) {
+                /*/
+                String s = com.alibaba.fastjson.JSON.toJSONString(container);
+                return s.getBytes(Charset.forName("UTF-8"));
+                */
+                return com.alibaba.fastjson.JSON.toJSONString(container,
+                        SerializerFeature.DisableCircularReferenceDetect);
+                //return com.alibaba.fastjson.JSON.toJSONString(container);
+            }
 
-    /**
-     *  Core extensions
-     */
-    protected void loadCoreHelpers() {
-
-        registerCryptoHelpers();
-        registerFormatHelpers();
-
-        registerAccountHelpers();
-
-        registerMessageHelpers();
-        registerCommandHelpers();
-
-    }
-
-    /**
-     *  ID, Address, Meta, Document parsers
-     */
-    protected void loadEntityFactories() {
-
-        registerIDFactory();
-        registerAddressFactory();
-
-        registerMetaFactories();
-
-        registerDocumentFactories();
-
-    }
-
-    /**
-     *  Message Factories
-     */
-    protected void loadMessageFactories() {
-
-        registerMessageFactories();
-
-        registerContentFactories();
-        registerCommandFactories();
+            @Override
+            public Object decode(String json) {
+                return com.alibaba.fastjson.JSON.parse(json);
+            }
+        };
 
     }
 

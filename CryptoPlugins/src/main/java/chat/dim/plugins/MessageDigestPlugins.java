@@ -1,13 +1,8 @@
 /* license: https://mit-license.org
- *
- *  DIMP : Decentralized Instant Messaging Protocol
- *
- *                                Written in 2022 by Moky <albert.moky@gmail.com>
- *
  * ==============================================================================
  * The MIT License (MIT)
  *
- * Copyright (c) 2022 Albert Moky
+ * Copyright (c) 2026 Albert Moky
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,63 +25,48 @@
  */
 package chat.dim.plugins;
 
+import org.bouncycastle.crypto.digests.KeccakDigest;
+import org.bouncycastle.crypto.digests.RIPEMD160Digest;
 
-/**
- *  Core Extensions Loader
- */
-public class ExtensionLoader implements CoreExtensions, EntityExtensions, MessageFactoryExtensions {
+import chat.dim.digest.KECCAK256;
+import chat.dim.digest.MessageDigester;
+import chat.dim.digest.RIPEMD160;
 
-    /**
-     *  Register core factories
-     */
-    public void load() {
 
-        loadCoreHelpers();
+// MixIn
+public interface MessageDigestPlugins {
 
-        loadEntityFactories();
+    // protected
+    default void registerRIPEMD160Digester() {
 
-        loadMessageFactories();
-
-    }
-
-    /**
-     *  Core extensions
-     */
-    protected void loadCoreHelpers() {
-
-        registerCryptoHelpers();
-        registerFormatHelpers();
-
-        registerAccountHelpers();
-
-        registerMessageHelpers();
-        registerCommandHelpers();
+        // RipeMD-160
+        RIPEMD160.digester = new MessageDigester() {
+            @Override
+            public byte[] digest(byte[] data) {
+                RIPEMD160Digest digest = new RIPEMD160Digest();
+                digest.update(data, 0, data.length);
+                byte[] out = new byte[20];
+                digest.doFinal(out, 0);
+                return out;
+            }
+        };
 
     }
 
-    /**
-     *  ID, Address, Meta, Document parsers
-     */
-    protected void loadEntityFactories() {
+    // protected
+    default void registerKeccak256Digester() {
 
-        registerIDFactory();
-        registerAddressFactory();
-
-        registerMetaFactories();
-
-        registerDocumentFactories();
-
-    }
-
-    /**
-     *  Message Factories
-     */
-    protected void loadMessageFactories() {
-
-        registerMessageFactories();
-
-        registerContentFactories();
-        registerCommandFactories();
+        // Keccak-256
+        KECCAK256.digester = new MessageDigester() {
+            @Override
+            public byte[] digest(byte[] data) {
+                KeccakDigest digest = new KeccakDigest(256);
+                digest.update(data, 0, data.length);
+                byte[] out = new byte[digest.getDigestSize()];
+                digest.doFinal(out, 0);
+                return out;
+            }
+        };
 
     }
 

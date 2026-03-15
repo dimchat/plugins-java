@@ -51,8 +51,6 @@
 ### Address
 
 ```java
-package chat.dim.compat;
-
 import chat.dim.mem.*;
 import chat.dim.protocol.Address;
 
@@ -60,14 +58,9 @@ public class CompatibleAddressFactory extends BaseAddressFactory {
 
     @Override
     protected Address parse(String address) {
-        if (address == null) {
-            //throw new NullPointerException("address empty");
-            assert false : "address empty";
-            return null;
-        }
-        int len = address.length();
+        int len = address == null ? 0 : address.length();
         if (len == 0) {
-            assert false : "address empty";
+            assert false : "address empty: " + address;
             return null;
         } else if (len == 8) {
             // "anywhere"
@@ -103,8 +96,6 @@ public class CompatibleAddressFactory extends BaseAddressFactory {
 ```
 
 ```java
-package chat.dim.compat;
-
 import chat.dim.protocol.Address;
 import chat.dim.type.ConstantString;
 
@@ -116,7 +107,7 @@ public final class UnknownAddress extends ConstantString implements Address {
 
     @Override
     public int getNetwork() {
-        return 0;
+        return 0;  // EntityType.USER;
     }
 
 }
@@ -125,12 +116,10 @@ public final class UnknownAddress extends ConstantString implements Address {
 ### Meta
 
 ```java
-package chat.dim.compat;
-
 import java.util.Map;
 
 import chat.dim.mkm.*;
-import chat.dim.plugins.SharedAccountExtensions;
+import chat.dim.ext.SharedAccountExtensions;
 import chat.dim.protocol.Meta;
 
 public final class CompatibleMetaFactory extends BaseMetaFactory {
@@ -174,16 +163,27 @@ public final class CompatibleMetaFactory extends BaseMetaFactory {
 ### Plugin Loader
 
 ```java
-package chat.dim.compat;
-
-import chat.dim.plugins.PluginLoader;
+import chat.dim.plugins.*;
 import chat.dim.protocol.*;
 
 public class CompatiblePluginLoader extends PluginLoader {
 
+   private final CryptoPluginLoader extraPluginLoader = new CryptoPluginLoader();
+   //private final NativePluginLoader extraPluginLoader = new NativePluginLoader();
+
+    @Override
+    public void load() {
+        super.load();
+        
+        // load extra plugins
+        extraPluginLoader.load();
+    }
+
     @Override
     protected void registerAddressFactory() {
+        
         Address.setFactory(new CompatibleAddressFactory());
+        
     }
 
     @Override
@@ -204,6 +204,7 @@ public class CompatiblePluginLoader extends PluginLoader {
         Meta.setFactory("MKM", mkm);
         Meta.setFactory("BTC", btc);
         Meta.setFactory("ETH", eth);
+        
     }
 
 }
@@ -212,30 +213,28 @@ public class CompatiblePluginLoader extends PluginLoader {
 ### ExtensionLoader
 
 ```java
-import chat.dim.dkd.AppCustomizedContent;
+import chat.dim.dkd.*;
 import chat.dim.plugins.ExtensionLoader;
 import chat.dim.protocol.*;
 
-
-/**
- *  Extensions Loader
- *  ~~~~~~~~~~~~~~~~~
- */
 public class CommonExtensionLoader extends ExtensionLoader {
 
     @Override
+    public void registerContentFactories() {
+        super.registerContentFactories();
+
+        registerCustomizedFactories();
+        
+    }
+
     protected void registerCustomizedFactories() {
 
         // Application Customized
-        setContentFactory(ContentType.CUSTOMIZED, "customized", AppCustomizedContent::new);
-        setContentFactory(ContentType.APPLICATION, "application", AppCustomizedContent::new);
+        Content.setFactory(ContentType.APPLICATION, AppCustomizedContent::new);
+        Content.setFactory(ContentType.CUSTOMIZED, AppCustomizedContent::new);
 
-        //super.registerCustomizedFactories();
     }
 
-    /**
-     *  Command factories
-     */
     @Override
     protected void registerCommandFactories() {
         super.registerCommandFactories();
@@ -253,8 +252,6 @@ public class CommonExtensionLoader extends ExtensionLoader {
 You must load all plugins before your business run:
 
 ```java
-package chat.dim.compat;
-
 import chat.dim.plugins.ExtensionLoader;
 import chat.dim.plugins.PluginLoader;
 
