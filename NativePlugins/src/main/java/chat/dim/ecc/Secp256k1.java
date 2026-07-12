@@ -25,7 +25,10 @@
  */
 package chat.dim.ecc;
 
-public class Secp256k1 {
+public final class Secp256k1 {
+    private Secp256k1() {
+        throw new AssertionError("Utility class cannot be instantiated");
+    }
 
     /**
      *  Make key pair for SECP256k1

@@ -49,6 +49,9 @@ import chat.dim.format.PEM;
 import chat.dim.utils.CryptoUtils;
 
 public final class ECCKeys {
+    private ECCKeys() {
+        throw new AssertionError("Utility class cannot be instantiated");
+    }
 
     private static final byte[] privatePrefix = Hex.decode("303E020100301006072A8648CE3D020106052B8104000A042730250201010420");
 

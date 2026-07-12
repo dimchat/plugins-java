@@ -26,6 +26,9 @@
 package chat.dim.utils;
 
 public final class CryptoUtils {
+    private CryptoUtils() {
+        throw new AssertionError("Utility class cannot be instantiated");
+    }
 
     //
     //  Algorithms

@@ -32,6 +32,9 @@ import chat.dim.format.Base64;
  *  Content-Transfer-Encoding -- https://tools.ietf.org/html/rfc2045
  */
 public final class CTE {
+    private CTE() {
+        throw new AssertionError("Utility class cannot be instantiated");
+    }
 
     static final int MIME_LINE_MAX_LEN = 76;
 

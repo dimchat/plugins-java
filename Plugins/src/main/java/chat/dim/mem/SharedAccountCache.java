@@ -34,6 +34,9 @@ import chat.dim.protocol.Address;
 import chat.dim.protocol.ID;
 
 public final class SharedAccountCache {
+    private SharedAccountCache() {
+        throw new AssertionError("Utility class cannot be instantiated");
+    }
 
     public static final MemoryCache<String, Address> addressCache = new ThanosCache<>();
 

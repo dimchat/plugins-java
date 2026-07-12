@@ -76,37 +76,16 @@ public class IdentifierFactory implements ID.Factory {
     }
 
     protected ID parse(final String identifier) {
-        String name;
-        Address address;
-        String terminal;
-        // split ID string
+        // split for "terminal"
         String[] pair = identifier.split("/");
-        assert pair[0].length() > 0 : "ID error: " + identifier;
-        // terminal
-        if (pair.length == 1) {
-            // no terminal
-            terminal = null;
-        } else {
-            // got terminal
-            //assert pair.length == 2 : "ID error: " + identifier;
-            terminal = pair[1];
-            assert terminal.length() > 0 : "ID.terminal error: " + identifier;
-        }
-        // name @ address
+        int cnt = pair.length;
+        String terminal = cnt == 1 ? null : pair[1];
+        // split for "name" @ "address"
         pair = pair[0].split("@");
-        assert pair[0].length() > 0 : "ID error: " + identifier;
-        if (pair.length == 1) {
-            // got address without name
-            name = null;
-            address = Address.parse(pair[0]);
-        } else if (pair.length == 2) {
-            // got name & address
-            name = pair[0];
-            address = Address.parse(pair[1]);
-        } else {
-            assert false : "ID error: " + identifier;
-            return null;
-        }
+        cnt = pair.length;
+        String name = cnt == 1 ? null : pair[0];
+        Address address = Address.parse(pair[cnt-1]);
+        // done
         if (address == null) {
             assert false : "cannot get address from id: " + identifier;
             return null;

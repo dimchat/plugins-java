@@ -40,6 +40,9 @@ import java.security.spec.EllipticCurve;
 import chat.dim.utils.CryptoUtils;
 
 final class ECCGenerator {
+    private ECCGenerator() {
+        throw new AssertionError("Utility class cannot be instantiated");
+    }
 
     public static ECPublicKey getPublicKey(ECPrivateKey pk) throws GeneralSecurityException {
         ECParameterSpec params = pk.getParams();

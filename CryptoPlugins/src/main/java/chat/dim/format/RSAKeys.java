@@ -31,6 +31,9 @@ import java.security.PublicKey;
 import chat.dim.protocol.AsymmetricAlgorithms;
 
 public final class RSAKeys {
+    private RSAKeys() {
+        throw new AssertionError("Utility class cannot be instantiated");
+    }
 
     public static String encodePublicKey(PublicKey key) {
         return publicKeyParser.encode(key);

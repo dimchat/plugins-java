@@ -42,6 +42,9 @@ import chat.dim.rfc.X509;
 
 
 public final class PEM {
+    private PEM() {
+        throw new AssertionError("Utility class cannot be instantiated");
+    }
 
     public static String encodePublicKey(PublicKey key, String algorithm) {
         try {

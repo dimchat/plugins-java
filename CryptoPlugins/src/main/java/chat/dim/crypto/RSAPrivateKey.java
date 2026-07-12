@@ -76,7 +76,7 @@ public final class RSAPrivateKey extends BasePrivateKey implements DecryptKey {
     }
     public static RSAPrivateKey newKey(int sizeInBits) throws NoSuchAlgorithmException {
         Map<String, Object> info = new HashMap<>();
-        info.put("algorithm", AsymmetricAlgorithms.ECC);
+        info.put("algorithm", AsymmetricAlgorithms.RSA);
 
         // generate key pair
         KeyPairGenerator generator = CryptoUtils.getKeyPairGenerator(AsymmetricAlgorithms.RSA);
