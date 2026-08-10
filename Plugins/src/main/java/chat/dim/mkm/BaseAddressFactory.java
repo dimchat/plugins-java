@@ -61,16 +61,11 @@ public class BaseAddressFactory implements Address.Factory {
     }
 
     protected Address parse(String address) {
-        if (address == null) {
-            //throw new NullPointerException("address empty");
-            assert false : "address empty";
-            return null;
-        }
-        int len = address.length();
-        if (len == 0) {
-            assert false : "address empty";
-            return null;
-        } else if (len == 8) {
+        int len = address == null ? 0 : address.length();
+        //
+        //  check broadcast address
+        //
+        if (len == 8) {
             // "anywhere"
             if (Address.ANYWHERE.equalsIgnoreCase(address)) {
                 return Address.ANYWHERE;
@@ -81,21 +76,21 @@ public class BaseAddressFactory implements Address.Factory {
                 return Address.EVERYWHERE;
             }
         }
-        Address res;
+        //
+        //  checking normal address
+        //
         if (26 <= len && len <= 35) {
             // BTC
-            res = BTCAddress.parse(address);
+            return BTCAddress.parse(address);
         } else if (len == 42) {
             // ETH
-            res = ETHAddress.parse(address);
-        } else {
-            //throw new AssertionError("invalid address: " + address);
-            assert false : "invalid address: " + address;
-            res = null;
+            return ETHAddress.parse(address);
         }
+        //
         // TODO: other types of address
-        assert res != null : "invalid address: " + address;
-        return res;
+        //
+        assert false : "invalid address: " + address;
+        return null;
     }
 
 }

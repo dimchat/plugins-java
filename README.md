@@ -160,24 +160,14 @@ public final class CompatibleMetaFactory extends BaseMetaFactory {
 }
 ```
 
-### Plugin Loader
+### ExtensionLoader
 
 ```java
+import chat.dim.dkd.*;
 import chat.dim.plugins.*;
 import chat.dim.protocol.*;
 
-public class CompatiblePluginLoader extends PluginLoader {
-
-   private final CryptoPluginLoader extraPluginLoader = new CryptoPluginLoader();
-   //private final NativePluginLoader extraPluginLoader = new NativePluginLoader();
-
-    @Override
-    public void load() {
-        super.load();
-        
-        // load extra plugins
-        extraPluginLoader.load();
-    }
+public class CommonExtensionLoader extends ExtensionLoader {
 
     @Override
     protected void registerAddressFactory() {
@@ -207,18 +197,6 @@ public class CompatiblePluginLoader extends PluginLoader {
         
     }
 
-}
-```
-
-### ExtensionLoader
-
-```java
-import chat.dim.dkd.*;
-import chat.dim.plugins.ExtensionLoader;
-import chat.dim.protocol.*;
-
-public class CommonExtensionLoader extends ExtensionLoader {
-
     @Override
     public void registerContentFactories() {
         super.registerContentFactories();
@@ -242,6 +220,28 @@ public class CommonExtensionLoader extends ExtensionLoader {
         // Handshake
         setCommandFactory(HandshakeCommand.HANDSHAKE, HandshakeCommand::new);
 
+    }
+
+}
+```
+
+### Plugin Loader
+
+```java
+import chat.dim.plugins.*;
+import chat.dim.protocol.*;
+
+public class CompatiblePluginLoader extends PluginLoader {
+
+   private final CryptoPluginLoader extraPluginLoader = new CryptoPluginLoader();
+   //private final NativePluginLoader extraPluginLoader = new NativePluginLoader();
+
+    @Override
+    public void load() {
+        super.load();
+        
+        // load extra plugins
+        extraPluginLoader.load();
     }
 
 }
