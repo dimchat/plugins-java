@@ -168,10 +168,10 @@ public class AccountGeneralFactory implements GeneralAccountHelper,
     }
 
     @Override
-    public ID generateID(Meta meta, int network, String terminal) {
+    public ID generateID(Meta meta, int network) {
         ID.Factory factory = getIDFactory();
         assert factory != null : "ID factory not ready";
-        return factory.generateID(meta, network, terminal);
+        return factory.generateID(meta, network);
     }
 
     //

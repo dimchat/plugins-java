@@ -104,7 +104,7 @@ public class EntityTest {
         Log.info("meta: " + meta + ", detail: " + getMetaInfo(meta));
         Assert.assertTrue(MetaUtils.matches(pk, meta));
 
-        ID identifier = ID.generate(meta, EntityType.USER.value, null);
+        ID identifier = ID.generate(meta, EntityType.USER.value);
         Log.info("ID: " + identifier + ", detail: " + getIDInfo(identifier));
         Assert.assertTrue(MetaUtils.matches(identifier, meta));
 

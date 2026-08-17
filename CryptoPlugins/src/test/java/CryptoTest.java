@@ -111,7 +111,7 @@ public class CryptoTest {
     private void checkX(String metaJson, String skJson) {
         Object metaDict = JSON.decode(metaJson);
         Meta meta = Meta.parse(metaDict);
-        ID identifier = ID.generate(meta, EntityType.USER.value, null);
+        ID identifier = ID.generate(meta, EntityType.USER.value);
         Log.info("meta: " + meta);
         Log.info("ID: " + identifier);
 

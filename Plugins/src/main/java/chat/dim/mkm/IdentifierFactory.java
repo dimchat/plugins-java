@@ -41,10 +41,10 @@ import chat.dim.protocol.Meta;
 public class IdentifierFactory implements ID.Factory {
 
     @Override
-    public ID generateID(Meta meta, int network, String terminal) {
+    public ID generateID(Meta meta, int network) {
         Address address = Address.generate(meta, network);
         assert address != null : "failed to generate ID with meta: " + meta.toMap();
-        return ID.create(meta.getSeed(), address, terminal);
+        return ID.create(meta.getSeed(), address, null);
     }
 
     @Override
