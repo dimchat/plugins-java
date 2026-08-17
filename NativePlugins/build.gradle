@@ -7,11 +7,11 @@ plugins {
 }
 
 group = 'chat.dim'
-version = '2.3.1'
+version = '2.4.0'
 //version '1.0-SNAPSHOT'
 
 def mod = 'NativePlugins'
-def desc = 'Extensions for cryptography'
+def desc = 'DIM Algorithm Plugins'
 
 def siteUrl = 'https://github.com/dimchat/plugins-java'
 def gitUrl = 'https://github.com/dimchat/plugins-java.git'
@@ -37,6 +37,7 @@ dependencies {
     implementation group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.60'
 
     testImplementation group: 'chat.dim', name: 'SDK', version: '2.4.0'
+    testImplementation group: 'chat.dim', name: 'Extensions', version: '2.4.0'
     testImplementation group: 'chat.dim', name: 'Plugins', version: '2.4.0'
     testImplementation group: 'junit', name: 'junit', version: '4.12'
 }

@@ -11,7 +11,7 @@ version = '2.4.0'
 //version '1.0-SNAPSHOT'
 
 def mod = 'Plugins'
-def desc = 'Extensions for cryptography and user identity'
+def desc = 'DIM Algorithm Plugins'
 
 def siteUrl = 'https://github.com/dimchat/plugins-java'
 def gitUrl = 'https://github.com/dimchat/plugins-java.git'
@@ -33,6 +33,7 @@ repositories {
 dependencies {
     api group: 'chat.dim', name: 'DIMP', version: '2.4.0'
 
+    testImplementation group: 'chat.dim', name: 'Extensions', version: '2.4.0'
     testImplementation group: 'junit', name: 'junit', version: '4.12'
 }
 
